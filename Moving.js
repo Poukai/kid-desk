@@ -25,6 +25,7 @@ class Moving extends Component {
     console.log(a)
   }
   render() {
+    console.log(this.props.navigation.state)
     return (
       <View style={styles.mainContainer}>
         <Grid>
@@ -34,7 +35,7 @@ class Moving extends Component {
                 alignItems: 'center',
                 justifyContent: 'center',
                 position:'relative'}}>
-              <Text style={styles.arrowText}>Desk is moving up..</Text>
+              <Text style={styles.arrowText}>Desk is moving up..{this.props.navigation.state.params.data}</Text>
               {/* <View style={this.props.navigation.state.params.cmd.Command=="UP" ? [styles.arrowCircle,styles.arrowCircleActive] : [styles.arrowCircle]}>
                 <Image
                   style={{
@@ -47,7 +48,7 @@ class Moving extends Component {
                 }}
                   source={require('./images/Moveup.png')}/>
               </View> */}
-              <Text style={styles.heightText}>142.5</Text>
+              <Text style={styles.heightText}>142.5{this.props.navigation.state.params.data}</Text>
               {/* <View style={this.props.navigation.state.params.cmd.Command=="DOWN" ? [styles.arrowCircle,styles.arrowCircleActive] : [styles.arrowCircle]}>
                 <Image
                   style={{

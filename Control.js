@@ -18,7 +18,7 @@ class Control extends Component {
     this
       .props
       .navigation
-      .navigate('Moving', {connected_peripheral: this.props.navigation.state.params.connected_peripheral,cmd });
+      .navigate('Moving', {connected_peripheral: this.props.navigation.state.params.connected_peripheral,cmd , height : this.props.navigation.state.params.height});
     sendCommand(this.props.navigation.state.params.connected_peripheral, cmd );
     
   }
@@ -30,6 +30,7 @@ class Control extends Component {
     sendCommand(this.props.navigation.state.params.connected_peripheral, cmd);
   }
   render() {
+    console.log(this.props.navigation.getParam('height'))
     return (
       <View style={styles.mainContainer}>
         <Button

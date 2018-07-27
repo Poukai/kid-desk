@@ -34,39 +34,29 @@ const fontFamily = Platform.OS === "ios"
 const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule); // create an event emitter for the BLE Manager module
 
-const PERIPHERAL_ID = "0000ffe0-0000-1000-8000-00805f9b34fb";
-const PRIMARY_SERVICE_ID = "0000ffe1-0000-1000-8000-00805f9b34fb";
+export const sendCommand = (id, command) => {
 
-export const sendCommand =(id, command)=> {
-  console.log("CHECK -->"+id+command);
-    let tmp = JSON.stringify(command);
-    const data = stringToBytes(tmp);
-    console.log("CHECK -->"+id+command+data);
-    BleManager.write(id, PERIPHERAL_ID, PRIMARY_SERVICE_ID, data)
-      .then(() => {
-        console.log('Write success : ' + data);
-      })
-      .catch((error) => {
-        // Failure code
-        console.log("Error", error);
-      });
-    // BleManager
-    //   .startNotification(id, PERIPHERAL_ID, PRIMARY_SERVICE_ID, data)
-    //   .then((readData) => {
-    //     console.log('Write: ' + data + "Response :" + readData);
-    //     const buffer = Buffer.from(readData); //https://github.com/feross/buffer#convert-arraybuffer-to-buffer
-    //     const sensorData = buffer.readUInt8(1, true);
-    //     bleManagerEmitter.addListener('BleManagerDidUpdateValueForCharacteristic', ({value, peripheral, characteristic, service}) => {
-    //       // Convert bytes array to string
-    //       const data = bytesToString(value);
-    //       console.log(`Recieved ${data} for characteristic ${characteristic}`);
-    //     });
-    //     return sensorData;
-    //   })
-    //   .catch((error) => {
-    //     // Failure code
-    //     console.log("Error", error);
-    //   });
+  BleManager
+    .retrieveServices(id)
+    .then((peripheralInfo) => {
+      // Success code
+      console.log(peripheralInfo);
+      const id = peripheralInfo.id;
+      const services = peripheralInfo.services;
+      const characteristics = peripheralInfo.characteristics;
+      let tmp = JSON.stringify(command);
+      const data = stringToBytes(tmp);
+      BleManager
+        .write(id, services[2].uuid, characteristics[6].characteristic, data)
+        .then(() => {
+          console.log("data")
+        })
+        .catch((error) => {
+          // Failure code
+          console.log(error);
+        });
+    });
+
 }
 
 class Scan extends Component {
@@ -78,35 +68,40 @@ class Scan extends Component {
       is_scanning: false,
       deviceList: [],
       connected_peripheral: "",
-      id: ""
+      id: "",
+      height:0
     };
     this.peripherals = []; // temporary storage for the detected peripherals
-    this.handleUpdateValueForCharacteristic = this
-      .handleUpdateValueForCharacteristic
-      .bind(this);
+    this.init();
   }
-  connect = (peripheral_id) => {
-    console.log(" connecting to this device " + peripheral_id);
+  connect = (id) => {
+    console.log(" connecting to this device " + id);
     BleManager
-      .connect(peripheral_id)
+      .connect(id)
       .then(() => {
         BleManager
-          .startNotification(peripheral_id, PERIPHERAL_ID, PRIMARY_SERVICE_ID)
-          .then(() => {
-            return bleManagerEmitter.addListener('BleManagerDidUpdateValueForCharacteristic', ({value, peripheral, characteristic, service}) => {
-              // Convert bytes array to string
-              const data = bytesToString(value);
-              console.log(`Recieved ${data} for characteristic ${characteristic}`);
-            });
-          });
-        BleManager
-          .retrieveServices(peripheral_id)
+          .retrieveServices(id)
           .then((peripheralInfo) => {
-            this
-              .props
-              .navigation
-              .navigate('Control', {connected_peripheral: this.state.connected_peripheral})
-            console.log('Peripheral info:', peripheralInfo);
+            // Success code
+            console.log(peripheralInfo);
+            const id = peripheralInfo.id;
+            const services = peripheralInfo.services;
+            const characteristics = peripheralInfo.characteristics;
+            BleManager
+              .startNotification(id, services[2].uuid, characteristics[6].characteristic)
+              .then(() => {
+                // Success code
+                bleManagerEmitter.addListener('BleManagerDidUpdateValueForCharacteristic', this.handleUpdateValueForCharacteristic);
+                this.props.navigation.navigate('Control', {
+                  connected_peripheral: id,
+                  height: this.state.height
+                });
+                console.log('Notification started');
+              })
+              .catch((error) => {
+                // Failure code
+                console.log(error);
+              });
           });
       })
       .catch((error) => {
@@ -122,14 +117,21 @@ class Scan extends Component {
     });
 
   }
-  componentDidMount() {
-    this.init()
-  }
+  componentDidMount() {}
   init = () => {
     Platform.OS == "android" && BleManager
       .enableBluetooth()
       .then(() => {
         console.log('Bluetooth is already enabled');
+        BleManager
+          .getConnectedPeripherals([])
+          .then((peripheralsArray) => {
+            // Success code
+            if (peripheralsArray.length > 0 && peripheralsArray[0].name === "KidDesk") {
+              this.connect(peripheralsArray[0].id)
+            }
+          });
+        this.startScan()
       })
       .catch((error) => {
         Alert.alert('You need to enable bluetooth to use this app.');
@@ -140,8 +142,6 @@ class Scan extends Component {
       .then(() => {
         console.log('Module initialized');
       });
-
-    this.startScan()
 
     if (this.peripherals.length > 0) {
       for (let i in this.peripherals) {
@@ -191,13 +191,21 @@ class Scan extends Component {
     this.setState({connected_peripheral: KidDeskItem.id})
     this.connect(KidDeskItem.id)
   }
-  handleUpdateValueForCharacteristic(data) {
+  handleUpdateValueForCharacteristic = (data) => {
     let temp = bytesToString(data.value);
+    let a = temp+"";
+    let b = a.split(",")[1];
+    if(a.includes("Height")){
+      const h = Number(b.match(/\d+/g));
+      this.props.navigation.setParams({height:h});
+      this.setState({
+        height:h
+      })
+    }
     console.log('Received : ' + temp);
   }
 
   handleButton = () => {
-    this.init()
     for (var i in this.peripherals) {
       if (this.peripherals[i].name == "KidDesk") {
         this.selectKidDesk(this.peripherals[i])
@@ -232,13 +240,8 @@ class Scan extends Component {
             renderItem={({item}) => <Text style={styles.deviceListItem} key={item.id}>{item.name}</Text>}/>}
           <Button
             onPress={this.handleButton}
-            title="Scan for Devices"
-            large
-            backgroundColor="#017DF7"/>
-          <Button
-            onPress={this.handleButton}
             buttonStyle={styles.openBTsettings}
-            title="Open Bluetooth Settings"
+            title="Scan for Devices"
             large
             backgroundColor="#017DF7"/>
         </View>
@@ -249,7 +252,8 @@ class Scan extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
+    paddingBottom: 50
   },
   headerTitle: {
     fontFamily: fontFamily,
@@ -297,7 +301,7 @@ const styles = StyleSheet.create({
     marginRight: 15
   },
   openBTsettings: {
-    marginTop: 20
+    marginBottom: 50
   },
   deviceListItem: {
     padding: 10
