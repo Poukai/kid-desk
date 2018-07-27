@@ -7,8 +7,10 @@ import Moving from "./Moving";
 import Edit from "./Edit";
 import Settings from "./Settings";
 import {Provider} from 'react-redux';
-import store from './store';
-
+import rootReducer from './reducers/index'
+import {createStore} from 'redux'
+// import store from './store';
+const store = createStore(rootReducer)
 const RootStack = createStackNavigator({
   Scan: {
     screen: Scan
@@ -33,14 +35,13 @@ const RootStack = createStackNavigator({
 class App extends React.Component {
   render() {
     return (
-      <View style={{
-        flex: 1
-      }}>
-        <Provider store={store}>
+      <Provider store={store}>
+        <View style={{
+          flex: 1
+        }}>
           <StatusBar hidden={true}/><RootStack/>
-        </Provider>
-
-      </View>
+        </View>
+      </Provider>
     );
   }
 }

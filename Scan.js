@@ -1,4 +1,6 @@
 import React, {Component} from 'react';
+import { connect } from 'react-redux';
+import { updateHeight } from './actions/index'
 import {
   StyleSheet,
   View,
@@ -197,7 +199,7 @@ class Scan extends Component {
     let b = a.split(",")[1];
     if(a.includes("Height")){
       const h = Number(b.match(/\d+/g));
-      this.props.navigation.setParams({height:h});
+      this.props.updateHeight(h);
       this.setState({
         height:h
       })
@@ -308,4 +310,12 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Scan;
+const mapStateToProps = (state) => ({
+  height: state.height,
+});
+
+const mapDispatch = ({
+  updateHeight,
+});
+
+export default connect(mapStateToProps, mapDispatch)(Scan);
