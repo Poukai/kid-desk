@@ -6,12 +6,16 @@ import Dimensions from 'Dimensions';
 const {width, height} = Dimensions.get('window');
 import {Commands} from "./config";
 import {sendCommand} from "./Scan";
+import { connect } from 'react-redux';
+import { getHeight } from './actions/index'
 
 const blue = "#00A7F7";
 class Moving extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      height
+    };
   }
   handleClickMovement() {
     console.log("test");
@@ -25,7 +29,7 @@ class Moving extends Component {
     console.log(a)
   }
   render() {
-    console.log(this.props.navigation.state)
+    console.log(this.props.getHeight())
     return (
       <View style={styles.mainContainer}>
         <Grid>
@@ -149,4 +153,13 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Moving;
+
+const mapStateToProps = (state) => ({
+  height: state.height,
+});
+
+const mapDispatch = ({
+  getHeight,
+});
+
+export default connect(mapStateToProps, mapDispatch)(Moving);
