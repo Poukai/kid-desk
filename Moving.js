@@ -29,7 +29,8 @@ class Moving extends Component {
     console.log(a)
   }
   render() {
-    console.log(this.props.height);
+    console.log(this.props.getHeight());
+    console.log(this);
     return (
       <View style={styles.mainContainer}>
         <Grid>
@@ -154,7 +155,9 @@ const styles = StyleSheet.create({
 });
 
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state) => (
+  console.log(state);
+  return {
   height: state.height,
 });
 
