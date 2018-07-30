@@ -8,6 +8,9 @@ import {Commands} from "./config";
 import {sendCommand} from "./Scan";
 import { connect } from 'react-redux';
 import { getHeight } from './actions/index'
+import { bindActionCreators } from 'redux';
+import { AsyncStorage } from "react-native"
+
 
 const blue = "#00A7F7";
 class Moving extends Component {
@@ -17,10 +20,36 @@ class Moving extends Component {
       height
     };
   }
+  componentWillMount(){
+    const value = await AsyncStorage.getItem('height');
+    console.log(value);
+    this.setState({height:value});
+  }
   handleClickMovement() {
     console.log("test");
   }
+  _storeData = async () => {
+    try {
+      await AsyncStorage.setItem('height', this.state.height);
+    } catch (error) {
+      // Error saving data
+    }
+  }
+  _retrieveData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('height');
+      if (value !== null) {
+        // We have data!!
+        console.log(value);
+        return value;
+      }
+     } catch (error) {
+       // Error retrieving data
+       return 70
+     }
+  }
   stopMovement=()=>{
+    this._storeData()
     this
     .props
     .navigation
@@ -28,9 +57,13 @@ class Moving extends Component {
     const a = sendCommand(this.props.navigation.state.params.connected_peripheral, Commands.STOP);
     console.log(a)
   }
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      height: nextProps.height.height,
+    });
+  }
   render() {
-    console.log(this.props.getHeight());
-    console.log(this);
+    const height = this.state.height;
     return (
       <View style={styles.mainContainer}>
         <Grid>
@@ -40,7 +73,7 @@ class Moving extends Component {
                 alignItems: 'center',
                 justifyContent: 'center',
                 position:'relative'}}>
-              <Text style={styles.arrowText}>Desk is moving up..{this.props.navigation.state.params.data}</Text>
+              <Text style={styles.arrowText}>Desk is moving up..</Text>
               {/* <View style={this.props.navigation.state.params.cmd.Command=="UP" ? [styles.arrowCircle,styles.arrowCircleActive] : [styles.arrowCircle]}>
                 <Image
                   style={{
@@ -53,7 +86,7 @@ class Moving extends Component {
                 }}
                   source={require('./images/Moveup.png')}/>
               </View> */}
-              <Text style={styles.heightText}>142.5{this.props.navigation.state.params.data}</Text>
+              <Text style={styles.heightText}>{height.toString()}</Text>
               {/* <View style={this.props.navigation.state.params.cmd.Command=="DOWN" ? [styles.arrowCircle,styles.arrowCircleActive] : [styles.arrowCircle]}>
                 <Image
                   style={{
@@ -155,14 +188,12 @@ const styles = StyleSheet.create({
 });
 
 
-const mapStateToProps = (state) => (
-  console.log(state);
-  return {
-  height: state.height,
+const mapStateToProps = (state) => ({
+  height: state.update,
 });
 
-const mapDispatch = ({
-  getHeight,
+const mapDispatchToProps = dispatch => ({
+  getHeight: bindActionCreators(getHeight, dispatch),
 });
 
-export default connect(mapStateToProps, mapDispatch)(Moving);
+export default connect(mapStateToProps, mapDispatchToProps)(Moving);

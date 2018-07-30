@@ -24,6 +24,7 @@ import {
 import {createStackNavigator} from 'react-navigation';
 import {stringToBytes, bytesToString} from 'convert-string';
 import {Button} from 'react-native-elements';
+import { bindActionCreators } from 'redux';
 import BleManager from 'react-native-ble-manager'; // for talking to BLE peripherals
 var Buffer = require('buffer/').Buffer
 
@@ -204,9 +205,6 @@ class Scan extends Component {
     if(a.includes("Height")){
       const h = Number(b.match(/\d+/g));
       this.props.updateHeight(h);
-      this.setState({
-        height:h
-      })
     }
     console.log('Received : ' + temp);
   }
@@ -318,8 +316,7 @@ const mapStateToProps = (state) => ({
   height: state.height,
 });
 
-const mapDispatch = ({
-  updateHeight,
+const mapDispatchToProps = dispatch => ({
+  updateHeight: bindActionCreators(updateHeight, dispatch),
 });
-
-export default connect(mapStateToProps, mapDispatch)(Scan);
+export default connect(mapStateToProps, mapDispatchToProps)(Scan);

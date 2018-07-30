@@ -10,6 +10,7 @@ import {Provider} from 'react-redux';
 import rootReducer from './reducers/index'
 import {createStore} from 'redux'
 // import store from './store';
+
 const store = createStore(rootReducer)
 const RootStack = createStackNavigator({
   Scan: {
