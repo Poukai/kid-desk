@@ -29,7 +29,7 @@ class Moving extends Component {
     console.log(a)
   }
   render() {
-    console.log(this.props.getHeight())
+    console.log(this.props.height);
     return (
       <View style={styles.mainContainer}>
         <Grid>

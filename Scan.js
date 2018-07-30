@@ -57,6 +57,10 @@ export const sendCommand = (id, command) => {
           // Failure code
           console.log(error);
         });
+    })
+    .catch((error) => {
+      // Failure code
+      console.log(error);
     });
 
 }
