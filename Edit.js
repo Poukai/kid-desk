@@ -1,17 +1,29 @@
 import React, {Component} from 'react';
-import {View, Text, Image, StyleSheet, TouchableHighlight} from "react-native";
+import {View, Text, Image, StyleSheet, TouchableHighlight , Platform} from "react-native";
 import {Col, Row, Grid} from "react-native-easy-grid";
 import {Icon, Button} from 'react-native-elements'
 import Dimensions from 'Dimensions';
-import {sendCommand} from "./Scan";
 import {Commands} from "./config";
-
-const {width, height} = Dimensions.get('window');
+import {sendCommand} from "./Scan";
+import {connect} from 'react-redux';
+import {getHeight} from './actions/index'
+import {bindActionCreators} from 'redux';
 const blue = "#00A7F7";
+const {width, height} = Dimensions.get('window');
 class Edit extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      height
+    };
+  }
+  componentWillMount() {
+    this.setState({height : this.props.navigation.state.params.height});
+  }
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      height: nextProps.height.height
+    });
   }
   handleClickMovement = (cmd) => {
     const a = sendCommand(this.props.navigation.state.params.connected_peripheral, cmd);
@@ -19,6 +31,9 @@ class Edit extends Component {
   }
   handleBackPress=()=>{
     this.props.navigation.navigate('Control')
+  }
+  componentWillMount() {
+    this.setState({height : this.props.navigation.state.params.height});
   }
   save=()=>{
     console.log(this.props.navigation.state.params.cmd);
@@ -29,6 +44,8 @@ class Edit extends Component {
       .navigate('Control', {connected_peripheral: this.props.navigation.state.params.connected_peripheral })
   }
   render() {
+    const height = this.state.height;
+    console.log(height);
     return (
       <View style={styles.mainContainer}>
         <Grid>
@@ -55,7 +72,7 @@ class Edit extends Component {
                   position: 'relative'
                 }}
                   source={require('./images/Moveup.png')}/></TouchableHighlight>
-              <Text style={styles.heightText}>142.5</Text>
+              <Text style={styles.heightText}>{height.toString()}</Text>
               <TouchableHighlight
                 style={styles.arrowCircle}
                 onPress={() => {
@@ -89,6 +106,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     marginTop: 40,
     width: 220,
+    height:50,
   },
   arrowCircle: {
     backgroundColor: '#979797',
@@ -104,7 +122,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     height: 25,
     marginTop:4,
-    marginLeft:10
+    marginLeft:20
   },
   arrowCircleBig: {
     backgroundColor: '#979797',
@@ -123,6 +141,16 @@ const styles = StyleSheet.create({
     marginTop: 9,
     marginBottom:10,
     fontSize:18,
+  },
+  heightText: {
+    color: '#fff',
+    fontSize:72,
+    width:width,
+    marginLeft:"auto",
+    marginRight:"auto",
+    textAlign:"center",
+    fontWeight:"100",
+    fontFamily: "SFProDisplay-Thin",
   },
   headerTextView:{
     zIndex: 10000,
@@ -143,10 +171,6 @@ const styles = StyleSheet.create({
   },
   headerTextIcon:{
     position:'relative',
-  },
-  heightText:{
-    color:'#fff',
-    fontSize:48,
   },
   arrowTextBottom: {
     color: "#d5d5d5",
@@ -174,4 +198,10 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Edit;
+const mapStateToProps = (state) => ({height: state.update});
+
+const mapDispatchToProps = dispatch => ({
+  getHeight: bindActionCreators(getHeight, dispatch)
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Edit);

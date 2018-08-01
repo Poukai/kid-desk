@@ -1,18 +1,18 @@
 import React, {Component} from 'react';
-import {View, Text, Image, StyleSheet, TouchableHighlight} from "react-native";
+import {View, Text, Image, StyleSheet, TouchableHighlight , Platform} from "react-native";
 import {Col, Row, Grid} from "react-native-easy-grid";
 import {Icon, Button} from 'react-native-elements'
 import Dimensions from 'Dimensions';
 const {width, height} = Dimensions.get('window');
 import {Commands} from "./config";
 import {sendCommand} from "./Scan";
-import { connect } from 'react-redux';
-import { getHeight } from './actions/index'
-import { bindActionCreators } from 'redux';
-import { AsyncStorage } from "react-native"
-
-
+import {connect} from 'react-redux';
+import {getHeight} from './actions/index'
+import {bindActionCreators} from 'redux';
 const blue = "#00A7F7";
+const fontFamily = Platform.OS === "ios"
+  ? "System"
+  : "SFProDisplay"
 class Moving extends Component {
   constructor(props) {
     super(props);
@@ -20,86 +20,48 @@ class Moving extends Component {
       height
     };
   }
-  componentWillMount(){
-    const value = await AsyncStorage.getItem('height');
-    console.log(value);
-    this.setState({height:value});
+  componentWillMount() {
+    this.setState({height : this.props.navigation.state.params.height});
   }
+
   handleClickMovement() {
     console.log("test");
   }
-  _storeData = async () => {
-    try {
-      await AsyncStorage.setItem('height', this.state.height);
-    } catch (error) {
-      // Error saving data
-    }
-  }
-  _retrieveData = async () => {
-    try {
-      const value = await AsyncStorage.getItem('height');
-      if (value !== null) {
-        // We have data!!
-        console.log(value);
-        return value;
-      }
-     } catch (error) {
-       // Error retrieving data
-       return 70
-     }
-  }
-  stopMovement=()=>{
-    this._storeData()
+  stopMovement = () => {
     this
-    .props
-    .navigation
-    .navigate('Control', {connected_peripheral: this.props.navigation.state.params.connected_peripheral })
+      .props
+      .navigation
+      .navigate('Control', {connected_peripheral: this.props.navigation.state.params.connected_peripheral})
     const a = sendCommand(this.props.navigation.state.params.connected_peripheral, Commands.STOP);
-    console.log(a)
+    // console.log(a)
+    
   }
   componentWillReceiveProps(nextProps) {
     this.setState({
-      height: nextProps.height.height,
-    });
+      height: nextProps.height.height
+    }, this._storeData);
   }
   render() {
     const height = this.state.height;
+    console.log(height);
     return (
       <View style={styles.mainContainer}>
         <Grid>
           <Row>
-            <Col style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                position:'relative'}}>
-              <Text style={styles.arrowText}>Desk is moving up..</Text>
-              {/* <View style={this.props.navigation.state.params.cmd.Command=="UP" ? [styles.arrowCircle,styles.arrowCircleActive] : [styles.arrowCircle]}>
-                <Image
-                  style={{
-                  width: 35,
-                  height: 35,
-                  alignItems: "center",
-                  alignSelf: "center",
-                  marginTop: 14,
-                  position: 'relative'
-                }}
-                  source={require('./images/Moveup.png')}/>
-              </View> */}
+            <Col
+              style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'relative'
+            }}>
+              <Text style={styles.arrowText}>Desk is moving {this.props.navigation.state.params.cmd.Command=="UP" ?"up" : "down"}...</Text>
               <Text style={styles.heightText}>{height.toString()}</Text>
-              {/* <View style={this.props.navigation.state.params.cmd.Command=="DOWN" ? [styles.arrowCircle,styles.arrowCircleActive] : [styles.arrowCircle]}>
-                <Image
-                  style={{
-                  width: 35,
-                  height: 35,
-                  alignItems: "center",
-                  alignSelf: "center",
-                  marginTop: 14,
-                  position: 'relative',
-                }}
-                  source={require('./images/downArrow.png')}/>
-              </View> */}
-              <Button onPress={this.stopMovement} transparent buttonStyle={styles.arrowText} color="#ff0000" title="Tap to stop." />
+              <TouchableHighlight
+                onPress={this.stopMovement}
+                transparent>
+                <Text style={styles.stopText}>Tap to Stop</Text>
+                </TouchableHighlight>
             </Col>
           </Row>
         </Grid>
@@ -117,49 +79,36 @@ const styles = StyleSheet.create({
     marginLeft: "auto",
     marginRight: 10
   },
-  arrowBlock: {
-    backgroundColor: '#000000',
-    textAlign: 'center',
-    width: 130,
-    height: 130,
-    marginTop: 20,
-    borderRadius: 20,
-    marginLeft: 20,
-    marginRight: 20,
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  arrowBlockCutsom: {
-    marginRight: 0
-  },
-  arrowCircle: {
-    backgroundColor: '#979797',
-    width: 60,
-    borderRadius: 50,
-    height: 60,
-    marginTop:20,
-    marginBottom:20
-  },
-  arrowCircleBig: {
-    backgroundColor: '#979797',
-    width: 70,
-    borderRadius: 50,
-    height: 70
-  },
   mainContainer: {
     backgroundColor: '#000000',
-    width: width,
-    minHeight: height,
+    minWidth: width,
+    minHeight: height
   },
   arrowText: {
-    zIndex: 10000,
     marginTop: 9,
-    marginBottom:10,
+    marginBottom: 91,
+    color:"#fff",
+    fontSize:22,
+    fontFamily: fontFamily,
   },
-  heightText:{
-      color:'#fff',
-    fontSize:48,
+  heightText: {
+    color: '#fff',
+    fontSize:72,
+    width:width,
+    marginLeft:"auto",
+    marginRight:"auto",
+    textAlign:"center",
+    fontWeight:"100",
+    fontFamily: "SFProDisplay-Thin",
+  },
+  stopText:{
+    color: '#D8D8D8',
+    fontSize: 22,
+    marginTop:50,
+    marginLeft:"auto",
+    marginRight:"auto",
+    fontWeight:"100",
+    fontFamily: "SFProDisplay-Thin",
   },
   arrowTextBottom: {
     color: "#d5d5d5",
@@ -182,18 +131,15 @@ const styles = StyleSheet.create({
   arrowBlockExtremeRight: {
     minWidth: 75
   },
-  arrowCircleActive:{
-      backgroundColor:blue
+  arrowCircleActive: {
+    backgroundColor: blue
   }
 });
 
-
-const mapStateToProps = (state) => ({
-  height: state.update,
-});
+const mapStateToProps = (state) => ({height: state.update});
 
 const mapDispatchToProps = dispatch => ({
-  getHeight: bindActionCreators(getHeight, dispatch),
+  getHeight: bindActionCreators(getHeight, dispatch)
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Moving);

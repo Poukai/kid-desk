@@ -68,6 +68,12 @@
 		<string>Octicons.ttf</string>
 		<string>SimpleLineIcons.ttf</string>
 		<string>Zocial.ttf</string>
+		<string>SystemSanFranciscoDisplayThin.ttf</string>
+		<string>SystemSanFranciscoDisplayUltralight.ttf</string>
+		<string>SFProDisplay-Bold.ttf</string>
+		<string>SFProDisplay-Regular.ttf</string>
+		<string>SFProDisplay-Thin.ttf</string>
+		<string>SFProDisplay-Ultralight.ttf</string>
 	</array>
 </dict>
 </plist>

@@ -28,6 +28,7 @@ import { bindActionCreators } from 'redux';
 import BleManager from 'react-native-ble-manager'; // for talking to BLE peripherals
 var Buffer = require('buffer/').Buffer
 
+const blue = "#00A7F7";
 const ACCESS_TOKEN = 'token'
 const ACCOUNT = 'id'
 const DEVICE_NAME_DESK = "DeskBLE"
@@ -153,7 +154,7 @@ class Scan extends Component {
     if (this.peripherals.length > 0) {
       for (let i in this.peripherals) {
         if (this.peripherals[i].name == "KidDesk") {
-          this.selectKidDesk(this.peripherals[i])
+          // this.selectKidDesk(this.peripherals[i])
         }
       }
     }
@@ -171,7 +172,7 @@ class Scan extends Component {
           name: peripheral.name // descriptive name given to the peripheral
         });
         if (peripheral.name == "KidDesk") {
-          this.selectKidDesk(peripheral)
+          // this.selectKidDesk(peripheral)
         }
       }
       this.peripherals = peripherals; // update the array of peripherals
@@ -198,6 +199,10 @@ class Scan extends Component {
     this.setState({connected_peripheral: KidDeskItem.id})
     this.connect(KidDeskItem.id)
   }
+  selectDevice = (id) => {
+    this.setState({connected_peripheral: id})
+    this.connect(id)
+  }
   handleUpdateValueForCharacteristic = (data) => {
     let temp = bytesToString(data.value);
     let a = temp+"";
@@ -212,7 +217,7 @@ class Scan extends Component {
   handleButton = () => {
     for (var i in this.peripherals) {
       if (this.peripherals[i].name == "KidDesk") {
-        this.selectKidDesk(this.peripherals[i])
+        // this.selectKidDesk(this.peripherals[i])
       }
     }
   }
@@ -241,7 +246,7 @@ class Scan extends Component {
             data={this.state.deviceList}
             style={styles.deviceList}
             keyExtractor={(item, index) => index.toString()}
-            renderItem={({item}) => <Text style={styles.deviceListItem} key={item.id}>{item.name}</Text>}/>}
+            renderItem={({item}) => <TouchableHighlight underlayColor={blue} onPress={()=>{this.selectDevice(item.id)}} style={styles.deviceListItem} key={item.id}><Text>{item.id}{item.name}</Text></TouchableHighlight>}/>}
           <Button
             onPress={this.handleButton}
             buttonStyle={styles.openBTsettings}
