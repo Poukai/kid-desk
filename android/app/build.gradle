@@ -94,15 +94,15 @@ def enableSeparateBuildPerCPUArchitecture = false
 def enableProguardInReleaseBuilds = false
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
     aaptOptions.cruncherEnabled = false
     aaptOptions.useNewCruncher = false
 
     defaultConfig {
         applicationId "com.kid_desk"
-        minSdkVersion 19
-        targetSdkVersion 22
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
         ndk {
@@ -121,7 +121,7 @@ android {
         config {
             keyAlias 'autonomous'
             keyPassword '123456'
-            storeFile file('./keystores/key.keystore')
+            storeFile file('./kiddesk')
             storePassword '123456'
         }
     }
