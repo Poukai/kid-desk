@@ -5020,6 +5020,10 @@ react-navigation-tabs@0.5.1:
     react-native-safe-area-view "^0.7.0"
     react-native-tab-view "^1.0.0"
 
+react-navigation-transitions@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/react-navigation-transitions/-/react-navigation-transitions-1.0.4.tgz#c812501e2928eab41cd16da9a4b3d91582c64c08"
+
 react-navigation@^2.6.2:
   version "2.6.2"
   resolved "https://registry.yarnpkg.com/react-navigation/-/react-navigation-2.6.2.tgz#a8fdb69c5876698f7e58c5a3962a78ba24bb2058"

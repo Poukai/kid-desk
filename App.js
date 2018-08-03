@@ -1,17 +1,22 @@
 import React from 'react';
-import {StyleSheet, Text, View, StatusBar} from 'react-native';
+import {StyleSheet, Text, View, StatusBar, AsyncStorage} from 'react-native';
 import {createStackNavigator} from 'react-navigation';
 import Scan from "./Scan";
 import Control from "./Control";
 import Moving from "./Moving";
 import Edit from "./Edit";
+import Home from "./Home";
 import Settings from "./Settings";
 import {Provider} from 'react-redux';
 import rootReducer from './reducers/index'
 import {createStore} from 'redux'
-// import store from './store';
+import {fadeIn} from 'react-navigation-transitions';
+import localStorage from 'react-native-sync-localstorage';
 
-const store = createStore(rootReducer)
+global.id="abcdef0123456789";
+
+const store = createStore(rootReducer);
+
 const RootStack = createStackNavigator({
   Scan: {
     screen: Scan
@@ -27,13 +32,19 @@ const RootStack = createStackNavigator({
   },
   Edit: {
     screen: Edit
+  },
+  Home: {
+    screen: Home
   }
 }, {
-  initialRouteName: 'Scan',
+  initialRouteName: "Home",
+  transitionConfig: () => fadeIn(),
   headerMode: 'none'
 });
 
 class App extends React.Component {
+  componentWillMount() {
+  }
   render() {
     return (
       <Provider store={store}>

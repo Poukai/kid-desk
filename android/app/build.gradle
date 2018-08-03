@@ -96,6 +96,8 @@ def enableProguardInReleaseBuilds = false
 android {
     compileSdkVersion 26
     buildToolsVersion "26.0.1"
+    aaptOptions.cruncherEnabled = false
+    aaptOptions.useNewCruncher = false
 
     defaultConfig {
         applicationId "com.kid_desk"
@@ -115,10 +117,19 @@ android {
             include "armeabi-v7a", "x86"
         }
     }
+    signingConfigs {
+        config {
+            keyAlias 'autonomous'
+            keyPassword '123456'
+            storeFile file('./keystores/key.keystore')
+            storePassword '123456'
+        }
+    }
     buildTypes {
         release {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            signingConfig signingConfigs.config
         }
     }
     // applicationVariants are e.g. debug, release

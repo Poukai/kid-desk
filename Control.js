@@ -1,16 +1,35 @@
 import React, {Component} from 'react';
-import {View, Text, Image, StyleSheet, TouchableHighlight} from "react-native";
-import {Col, Row, Grid} from "react-native-easy-grid";
-import {Icon, Button} from 'react-native-elements'
-import Dimensions from 'Dimensions';
-import {sendCommand,getDeskHeight} from "./Scan";
-import {Commands} from "./config";
-import {AsyncStorage} from 'react-native';
-import localStorage from 'react-native-sync-localstorage';
+import { connect } from 'react-redux';
+import { getHeight } from './actions/index'
+import {
+  StyleSheet,
+  View,
+  Image,
+  Dimensions,
+  Keyboard,
+  TextInput,
+  TouchableOpacity,
+  TouchableHighlight,
+  Text,
+  AsyncStorage,
+  ActivityIndicator,
+  ScrollView,
+  NativeEventEmitter, // for emitting events for the BLE manager
+  NativeModules, // for getting an instance of the BLE manager module
+  Platform,
+  FlatList,
+  PermissionsAndroid,
+  Alert
+} from 'react-native';
+import {createStackNavigator} from 'react-navigation';
 import {stringToBytes, bytesToString} from 'convert-string';
+import {Button} from 'react-native-elements';
 import { bindActionCreators } from 'redux';
 import BleManager from 'react-native-ble-manager'; // for talking to BLE peripherals
 var Buffer = require('buffer/').Buffer
+import {Col, Row, Grid} from "react-native-easy-grid";
+import {Commands} from "./config";
+import {sendCommand} from "./Scan";
 
 console.log(global.storage);
 const storage = global.storage;
@@ -22,35 +41,33 @@ class Control extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      userId : "A",
-      initialHeight : 70
+      height,
+      userId : "A"
     };
-    this.setData("A");
-    this.setData("B");
   }
   handleClickMovement = (cmd) => {
-    console.log(this.state.initialHeight);
-    this
+    console.log(this.state.height);
+    this.state.height && this
       .props
       .navigation
       .navigate('Moving', {
         connected_peripheral: this.props.navigation.state.params.connected_peripheral,
         cmd,
-        height: this.state.initialHeight
+        height: this.state.height
       });
     sendCommand(this.props.navigation.state.params.connected_peripheral, cmd);
 
   }
 
   handleLongPress = (cmd) => {
-    console.log(this.state.initialHeight);
-    this
+    console.log(this.state.height);
+    this.state.height && this
       .props
       .navigation
       .navigate('Edit', {
         connected_peripheral: this.props.navigation.state.params.connected_peripheral,
         cmd,
-        height: this.state.initialHeight
+        height: this.state.height
       });
     sendCommand(this.props.navigation.state.params.connected_peripheral, cmd);
   }
@@ -86,14 +103,17 @@ class Control extends Component {
     this.getDeskHeight(this.props.navigation.state.params.connected_peripheral,Commands.GET_HEIGHT);
   }
 
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      height: nextProps.height.height
+    });
+  }
   setData = (profile,pos1=70,pos4=70) => {
-    console.log("Setting Data in localStorage for "+profile , pos1 , pos4);
-    localStorage.setItem(profile, {"POS1": pos1,"POS4": pos4});
+   
+    
 
   }
   getData = () => {
-    console.log("userA" + JSON.stringify(localStorage.getItem('userA')));
-    console.log("userB" + JSON.stringify(localStorage.getItem('userB')));
   }
   gotoSettings=()=>{
     this
@@ -115,20 +135,17 @@ class Control extends Component {
         <Grid>
 
         <Row style={styles.buttonsRow}>
-        <Button
-            onPress={()=>{this.getDeskHeight(this.props.navigation.state.params.connected_peripheral,Commands.GET_HEIGHT)}}
-            title="get height"
-            buttonStyle={styles.settingsButton}
-            transparent/>
           <Button
             onPress={()=>{this.switchProfile("A")}}
             title="Profile A"
-            buttonStyle={styles.settingsButton}
+            buttonStyle={[styles.settingsButton,this.state.userId == "A" ? styles.activeButton : styles.inactiveButton]}
+            textStyle={this.state.userId == "A" ? styles.activeButtonText : styles.inactiveButtonText}
             transparent/>
           <Button
             onPress={()=>{this.switchProfile("B")}}
             title="Profile B"
-            buttonStyle={styles.settingsButton}
+            textStyle={this.state.userId == "B" ? styles.activeButtonText : styles.inactiveButtonText}
+            buttonStyle={[styles.settingsButton,this.state.userId == "B" ? styles.activeButton : styles.inactiveButton]}
             transparent/>
           <Button
             leftIcon={{
@@ -146,7 +163,8 @@ class Control extends Component {
                 this.handleClickMovement(Commands.DOWN)
               }}
                 onLongPress={() => {
-                this.handleLongPress(Commands.SAVE_POS1)
+                const commandHighPoint = this.state.userId=="A" ? Commands.SAVE_POS1 : Commands.SAVE_POS2
+                this.handleLongPress(commandHighPoint)
               }}
                 underlayColor={blue}>
                 <Image
@@ -172,7 +190,8 @@ class Control extends Component {
                 this.handleClickMovement(Commands.UP)
               }}
                 onLongPress={() => {
-                this.handleLongPress(Commands.SAVE_POS4)
+                  const commandLowPoint = this.state.userId=="A" ? Commands.SAVE_POS4 : Commands.SAVE_POS3
+                  this.handleLongPress(commandLowPoint)
               }}
                 underlayColor={blue}>
                 <Image
@@ -219,6 +238,8 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     height: 70
   },
+  activeButton:{borderColor:blue,},
+  inactiveButton:{},
   mainContainer: {
     backgroundColor: '#222',
     position: 'absolute',
@@ -264,7 +285,20 @@ const styles = StyleSheet.create({
   },
   arrowBlockExtremeSecond: {
     marginTop: 10
+  },
+  inactiveButtonText:{
+    
+  },
+  activeButtonText:{
+    color:blue
   }
 });
 
-export default Control;
+
+const mapStateToProps = (state) => ({height: state.update});
+
+const mapDispatchToProps = dispatch => ({
+  getHeight: bindActionCreators(getHeight, dispatch)
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Control);

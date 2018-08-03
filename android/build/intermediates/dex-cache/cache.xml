@@ -3,12 +3,12 @@
 
     <item
         is-multidex="false"
-        jar="/Users/2apple_mjlq2/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/3.10.0/7ef0f1d95bf4c0b3ba30bbae25e0e562b05cf75e/okhttp-3.10.0.jar"
+        jar="/Users/2apple_mjlq2/.gradle/caches/modules-2/files-2.1/android.arch.core/common/1.0.0/a2d487452376193fc8c103dd2b9bd5f2b1b44563/common-1.0.0.jar"
         jumboMode="false"
         optimize="true"
         revision="26.0.1"
-        sha1="7ef0f1d95bf4c0b3ba30bbae25e0e562b05cf75e">
-        <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/okhttp-3.10.0_15966f37ef5589dc2a0954c0ec44acd966f464d7.jar" />
+        sha1="a2d487452376193fc8c103dd2b9bd5f2b1b44563">
+        <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/common-1.0.0_7785680103785757474de6113a1a4fe400315a49.jar" />
     </item>
     <item
         is-multidex="false"
@@ -18,15 +18,6 @@
         revision="26.0.1"
         sha1="0295663d24d4a1afa5b38a784f5ee8066f7fc354">
         <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/kid_desk-react-native-ble-manager-unspecified_29edfc7aab6bf4e381c0cd28df8f87db49e2facc.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/Users/2apple_mjlq2/.gradle/caches/modules-2/files-2.1/android.arch.core/common/1.0.0/a2d487452376193fc8c103dd2b9bd5f2b1b44563/common-1.0.0.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="26.0.1"
-        sha1="a2d487452376193fc8c103dd2b9bd5f2b1b44563">
-        <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/common-1.0.0_7785680103785757474de6113a1a4fe400315a49.jar" />
     </item>
     <item
         is-multidex="false"
@@ -57,24 +48,6 @@
     </item>
     <item
         is-multidex="false"
-        jar="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/exploded-aar/com.facebook.fbui.textlayoutbuilder/textlayoutbuilder/1.0.0/jars/classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="26.0.1"
-        sha1="f90b593491e4044903f0bbf68dc3fa2790b151b9">
-        <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/com.facebook.fbui.textlayoutbuilder-textlayoutbuilder-1.0.0_9f4ac12e1634d2b91aa6a49ef77a194d2b8f6d76.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/exploded-aar/com.facebook.fresco/fbcore/1.9.0/jars/classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="26.0.1"
-        sha1="ae15c560bc6685007440d8a70686f8348bafd791">
-        <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/com.facebook.fresco-fbcore-1.9.0_67a3e9288fdfb7916aa5381011845afaa3f503f9.jar" />
-    </item>
-    <item
-        is-multidex="false"
         jar="/Users/2apple_mjlq2/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio/1.14.0/102d7be47241d781ef95f1581d414b0943053130/okio-1.14.0.jar"
         jumboMode="false"
         optimize="true"
@@ -90,15 +63,6 @@
         revision="23.0.1"
         sha1="5871fb60dc68d67da54a663c3fd636a10a532948">
         <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/jsr305-3.0.0_869b44e418499b438e77df921234bba121c96b86.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/Users/2apple_mjlq2/.gradle/caches/modules-2/files-2.1/com.parse.bolts/bolts-tasks/1.4.0/d85884acf6810a3bbbecb587f239005cbc846dc4/bolts-tasks-1.4.0.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="23.0.1"
-        sha1="d85884acf6810a3bbbecb587f239005cbc846dc4">
-        <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/bolts-tasks-1.4.0_5fae11d6d62203d7851b1e7b747e587ab2e6c346.jar" />
     </item>
     <item
         is-multidex="false"
@@ -138,33 +102,6 @@
     </item>
     <item
         is-multidex="false"
-        jar="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/exploded-aar/com.facebook.fresco/imagepipeline-base/1.9.0/jars/classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="26.0.1"
-        sha1="87382214d92be4e3c931cb6aa7aa4e827bc179b7">
-        <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/com.facebook.fresco-imagepipeline-base-1.9.0_0ef41a01a127dbc8ecc324948e2cadb464b04104.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/exploded-aar/com.facebook.react/react-native/0.56.0/jars/libs/infer-annotations-4.0.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="26.0.1"
-        sha1="9809e90be788acdb479b2b44e2112f3295a03068">
-        <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/infer-annotations-4.0_21c78ed047462158b5467cc4f9ded3fdeca45c46.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/Users/2apple_mjlq2/.gradle/caches/modules-2/files-2.1/com.google.code.findbugs/jsr305/3.0.0/5871fb60dc68d67da54a663c3fd636a10a532948/jsr305-3.0.0.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="26.0.1"
-        sha1="5871fb60dc68d67da54a663c3fd636a10a532948">
-        <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/jsr305-3.0.0_869b44e418499b438e77df921234bba121c96b86.jar" />
-    </item>
-    <item
-        is-multidex="false"
         jar="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/exploded-aar/com.android.support/animated-vector-drawable/26.1.0/jars/classes.jar"
         jumboMode="false"
         optimize="true"
@@ -192,15 +129,6 @@
     </item>
     <item
         is-multidex="false"
-        jar="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/26.1.0/jars/classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="26.0.1"
-        sha1="f428e2fbc9ed0b297e3a3f420e51e6982f66822d">
-        <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/com.android.support-appcompat-v7-26.1.0_eb650da17c623b7ea33ef57ca6e40d6f1a31d50f.jar" />
-    </item>
-    <item
-        is-multidex="false"
         jar="/Users/2apple_mjlq2/.gradle/caches/modules-2/files-2.1/com.facebook.fbui.textlayoutbuilder/staticlayout-proxy/1.0/f162442a19fff13995fbd51ba414d9ee05579080/staticlayout-proxy-1.0.jar"
         jumboMode="false"
         optimize="true"
@@ -214,33 +142,6 @@
         jumboMode="false"
         optimize="true"
         revision="23.0.1"
-        sha1="6975da39a7040257bd51d21a231b76c915872d38">
-        <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/javax.inject-1_03cd9aa6e06b777850df3af58ab7205427701411.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/exploded-aar/com.facebook.fresco/imagepipeline/1.9.0/jars/classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="26.0.1"
-        sha1="1c9837ec75b2273699379c2ba0ae63d669b4f08c">
-        <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/com.facebook.fresco-imagepipeline-1.9.0_a56c2eef93eb8a920e1a9eb70803d43796cea8fb.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/exploded-aar/kid_desk/react-native-vector-icons/unspecified/jars/classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="26.0.1"
-        sha1="279750fed3c920d06351dbf32889c1b48203c7ad">
-        <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/kid_desk-react-native-vector-icons-unspecified_e8505848b41ca1bb352e30a15b56272c81c38b5e.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/Users/2apple_mjlq2/.gradle/caches/modules-2/files-2.1/javax.inject/javax.inject/1/6975da39a7040257bd51d21a231b76c915872d38/javax.inject-1.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="26.0.1"
         sha1="6975da39a7040257bd51d21a231b76c915872d38">
         <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/javax.inject-1_03cd9aa6e06b777850df3af58ab7205427701411.jar" />
     </item>
@@ -282,24 +183,6 @@
     </item>
     <item
         is-multidex="false"
-        jar="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/exploded-aar/com.facebook.fresco/drawee/1.9.0/jars/classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="26.0.1"
-        sha1="da59c80e4a1c8df62d2b4188ef3efddab8afa236">
-        <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/com.facebook.fresco-drawee-1.9.0_948a93956adc05978c72f25e45d326c492a04bf6.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/exploded-aar/com.facebook.soloader/soloader/0.3.0/jars/classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="26.0.1"
-        sha1="9803a14716e9f462afb5742811f3456c39f3be3a">
-        <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/com.facebook.soloader-soloader-0.3.0_2064255c9be84c9836c4ffd5e263bb7cd23b5832.jar" />
-    </item>
-    <item
-        is-multidex="false"
         jar="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/exploded-aar/com.android.support/support-fragment/26.1.0/jars/classes.jar"
         jumboMode="false"
         optimize="true"
@@ -324,6 +207,123 @@
         revision="26.0.1"
         sha1="e414a4cb28434e25c4f6aa71426eb20cf4874ae9">
         <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/common-1.0.0_0f8b5ff0fe47f5f0e70282b22174efa1cde0c97b.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/2apple_mjlq2/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/3.10.0/7ef0f1d95bf4c0b3ba30bbae25e0e562b05cf75e/okhttp-3.10.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.1"
+        sha1="7ef0f1d95bf4c0b3ba30bbae25e0e562b05cf75e">
+        <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/okhttp-3.10.0_15966f37ef5589dc2a0954c0ec44acd966f464d7.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/exploded-aar/com.facebook.fbui.textlayoutbuilder/textlayoutbuilder/1.0.0/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.1"
+        sha1="f90b593491e4044903f0bbf68dc3fa2790b151b9">
+        <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/com.facebook.fbui.textlayoutbuilder-textlayoutbuilder-1.0.0_9f4ac12e1634d2b91aa6a49ef77a194d2b8f6d76.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/exploded-aar/com.facebook.fresco/fbcore/1.9.0/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.1"
+        sha1="ae15c560bc6685007440d8a70686f8348bafd791">
+        <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/com.facebook.fresco-fbcore-1.9.0_67a3e9288fdfb7916aa5381011845afaa3f503f9.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/2apple_mjlq2/.gradle/caches/modules-2/files-2.1/com.parse.bolts/bolts-tasks/1.4.0/d85884acf6810a3bbbecb587f239005cbc846dc4/bolts-tasks-1.4.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="23.0.1"
+        sha1="d85884acf6810a3bbbecb587f239005cbc846dc4">
+        <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/bolts-tasks-1.4.0_5fae11d6d62203d7851b1e7b747e587ab2e6c346.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/exploded-aar/com.facebook.fresco/imagepipeline-base/1.9.0/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.1"
+        sha1="87382214d92be4e3c931cb6aa7aa4e827bc179b7">
+        <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/com.facebook.fresco-imagepipeline-base-1.9.0_0ef41a01a127dbc8ecc324948e2cadb464b04104.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/exploded-aar/com.facebook.react/react-native/0.56.0/jars/libs/infer-annotations-4.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.1"
+        sha1="9809e90be788acdb479b2b44e2112f3295a03068">
+        <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/infer-annotations-4.0_21c78ed047462158b5467cc4f9ded3fdeca45c46.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/2apple_mjlq2/.gradle/caches/modules-2/files-2.1/com.google.code.findbugs/jsr305/3.0.0/5871fb60dc68d67da54a663c3fd636a10a532948/jsr305-3.0.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.1"
+        sha1="5871fb60dc68d67da54a663c3fd636a10a532948">
+        <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/jsr305-3.0.0_869b44e418499b438e77df921234bba121c96b86.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/26.1.0/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.1"
+        sha1="f428e2fbc9ed0b297e3a3f420e51e6982f66822d">
+        <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/com.android.support-appcompat-v7-26.1.0_eb650da17c623b7ea33ef57ca6e40d6f1a31d50f.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/exploded-aar/com.facebook.fresco/imagepipeline/1.9.0/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.1"
+        sha1="1c9837ec75b2273699379c2ba0ae63d669b4f08c">
+        <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/com.facebook.fresco-imagepipeline-1.9.0_a56c2eef93eb8a920e1a9eb70803d43796cea8fb.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/exploded-aar/kid_desk/react-native-vector-icons/unspecified/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.1"
+        sha1="279750fed3c920d06351dbf32889c1b48203c7ad">
+        <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/kid_desk-react-native-vector-icons-unspecified_e8505848b41ca1bb352e30a15b56272c81c38b5e.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/2apple_mjlq2/.gradle/caches/modules-2/files-2.1/javax.inject/javax.inject/1/6975da39a7040257bd51d21a231b76c915872d38/javax.inject-1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.1"
+        sha1="6975da39a7040257bd51d21a231b76c915872d38">
+        <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/javax.inject-1_03cd9aa6e06b777850df3af58ab7205427701411.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/exploded-aar/com.facebook.fresco/drawee/1.9.0/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.1"
+        sha1="da59c80e4a1c8df62d2b4188ef3efddab8afa236">
+        <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/com.facebook.fresco-drawee-1.9.0_948a93956adc05978c72f25e45d326c492a04bf6.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/exploded-aar/com.facebook.soloader/soloader/0.3.0/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.1"
+        sha1="9803a14716e9f462afb5742811f3456c39f3be3a">
+        <dex dex="/Users/2apple_mjlq2/kid_desk/android/app/build/intermediates/pre-dexed/debug/com.facebook.soloader-soloader-0.3.0_2064255c9be84c9836c4ffd5e263bb7cd23b5832.jar" />
     </item>
     <item
         is-multidex="false"

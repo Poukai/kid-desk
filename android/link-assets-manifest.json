@@ -1,0 +1,41 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "assets/fonts/.DS_Store",
+      "sha1": "e6c17177e1c56c16247fbfde7c7efc274e87256d"
+    },
+    {
+      "path": "assets/fonts/SFProDisplay-Bold.ttf",
+      "sha1": "fbb5e777a0396bda409d80bd9c94b93afe963cce"
+    },
+    {
+      "path": "assets/fonts/SFProDisplay-Regular.ttf",
+      "sha1": "d38416ad361888e8cdb5bf6266107e827110595e"
+    },
+    {
+      "path": "assets/fonts/SFProDisplay-Thin.ttf",
+      "sha1": "81fc8c6dba8896834ae3f3fe36e98e7c2a2ba91a"
+    },
+    {
+      "path": "assets/fonts/SFProDisplay-Ultralight.ttf",
+      "sha1": "9fcb46220cf0dbcc266f3a50e43eefc6630ad86c"
+    },
+    {
+      "path": "assets/fonts/System San Francisco Display Bold.ttf",
+      "sha1": "fbb5e777a0396bda409d80bd9c94b93afe963cce"
+    },
+    {
+      "path": "assets/fonts/System San Francisco Display Regular.ttf",
+      "sha1": "d38416ad361888e8cdb5bf6266107e827110595e"
+    },
+    {
+      "path": "assets/fonts/System San Francisco Display Thin.ttf",
+      "sha1": "81fc8c6dba8896834ae3f3fe36e98e7c2a2ba91a"
+    },
+    {
+      "path": "assets/fonts/System San Francisco Display Ultralight.ttf",
+      "sha1": "9fcb46220cf0dbcc266f3a50e43eefc6630ad86c"
+    }
+  ]
+}

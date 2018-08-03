@@ -53,8 +53,6 @@
 	</dict>
 	<key>UIAppFonts</key>
 	<array>
-		<string>System San Francisco Display Thin.ttf</string>
-		<string>System San Francisco Display Ultralight.ttf</string>
 		<string>SystemSanFranciscoDisplayBold.ttf</string>
 		<string>SystemSanFranciscoDisplayRegular.ttf</string>
 		<string>Entypo.ttf</string>
@@ -74,6 +72,10 @@
 		<string>SFProDisplay-Regular.ttf</string>
 		<string>SFProDisplay-Thin.ttf</string>
 		<string>SFProDisplay-Ultralight.ttf</string>
+		<string>System San Francisco Display Bold.ttf</string>
+		<string>System San Francisco Display Regular.ttf</string>
+		<string>System San Francisco Display Thin.ttf</string>
+		<string>System San Francisco Display Ultralight.ttf</string>
 	</array>
 </dict>
 </plist>

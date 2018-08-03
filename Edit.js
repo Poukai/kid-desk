@@ -30,7 +30,10 @@ class Edit extends Component {
     console.log(a)
   }
   handleBackPress=()=>{
-    this.props.navigation.navigate('Control')
+    this
+      .props
+      .navigation
+      .navigate('Control', {connected_peripheral: this.props.navigation.state.params.connected_peripheral })
   }
   componentWillMount() {
     this.setState({height : this.props.navigation.state.params.height});

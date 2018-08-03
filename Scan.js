@@ -39,7 +39,6 @@ const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule); // create an event emitter for the BLE Manager module
 
 export const sendCommand = (id, command) => {
-
   BleManager
     .retrieveServices(id)
     .then((peripheralInfo) => {

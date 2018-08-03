@@ -71,7 +71,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		NEA+YZfYHKfRxGVCJB/GxAtQu+g=
+		8TMttmHYNAGYxXRap8puFUNElOo=
 		</data>
 		<key>Ionicons.ttf</key>
 		<data>
@@ -111,11 +111,35 @@
 		</data>
 		<key>PlugIns/kid_deskTests.xctest/kid_deskTests</key>
 		<data>
-		ImV1Eww3p6X54Blx7oLzq/QlwFE=
+		S0wi6ceKkUe0AYkCSXlKmeQrEB8=
+		</data>
+		<key>SFProDisplay-Bold.ttf</key>
+		<data>
+		+7Xnd6A5a9pAnYC9nJS5Ov6WPM4=
+		</data>
+		<key>SFProDisplay-Regular.ttf</key>
+		<data>
+		04QWrTYYiOjNtb9iZhB+gnEQWV4=
+		</data>
+		<key>SFProDisplay-Thin.ttf</key>
+		<data>
+		gfyMbbqIloNK4/P+NumOfCorqRo=
+		</data>
+		<key>SFProDisplay-Ultralight.ttf</key>
+		<data>
+		n8tGIgzw28wmbzpQ5D7vxmMK2Gw=
 		</data>
 		<key>SimpleLineIcons.ttf</key>
 		<data>
 		n/uBpaEREuKS8swyPphIa61ZdZk=
+		</data>
+		<key>System San Francisco Display Bold.ttf</key>
+		<data>
+		+7Xnd6A5a9pAnYC9nJS5Ov6WPM4=
+		</data>
+		<key>System San Francisco Display Regular.ttf</key>
+		<data>
+		04QWrTYYiOjNtb9iZhB+gnEQWV4=
 		</data>
 		<key>System San Francisco Display Thin.ttf</key>
 		<data>
@@ -132,6 +156,14 @@
 		<key>SystemSanFranciscoDisplayRegular.ttf</key>
 		<data>
 		04QWrTYYiOjNtb9iZhB+gnEQWV4=
+		</data>
+		<key>SystemSanFranciscoDisplayThin.ttf</key>
+		<data>
+		gfyMbbqIloNK4/P+NumOfCorqRo=
+		</data>
+		<key>SystemSanFranciscoDisplayUltralight.ttf</key>
+		<data>
+		n8tGIgzw28wmbzpQ5D7vxmMK2Gw=
 		</data>
 		<key>Zocial.ttf</key>
 		<data>
@@ -399,11 +431,55 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			ImV1Eww3p6X54Blx7oLzq/QlwFE=
+			S0wi6ceKkUe0AYkCSXlKmeQrEB8=
 			</data>
 			<key>hash2</key>
 			<data>
-			uyq4shpZxkbwRS0qgn9vxJG0yBbeeJcT5xRkwM6pAuY=
+			AxuM859/WssJSrEqPhTiP6oSyFShmG+pt5qcBlw/qeY=
+			</data>
+		</dict>
+		<key>SFProDisplay-Bold.ttf</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			+7Xnd6A5a9pAnYC9nJS5Ov6WPM4=
+			</data>
+			<key>hash2</key>
+			<data>
+			CSJpmWjWh25vSWKVouoy8moNIHViIg5tZh9Db/QThyA=
+			</data>
+		</dict>
+		<key>SFProDisplay-Regular.ttf</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			04QWrTYYiOjNtb9iZhB+gnEQWV4=
+			</data>
+			<key>hash2</key>
+			<data>
+			I2qtX7ECyTDw43KedPWvuIpkYbhd/tnaJfAmM0fS2EM=
+			</data>
+		</dict>
+		<key>SFProDisplay-Thin.ttf</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			gfyMbbqIloNK4/P+NumOfCorqRo=
+			</data>
+			<key>hash2</key>
+			<data>
+			ihAn79gPjVC7uxMLI3Ht78nZjL/hz5zEhP9O7rdVjWI=
+			</data>
+		</dict>
+		<key>SFProDisplay-Ultralight.ttf</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			n8tGIgzw28wmbzpQ5D7vxmMK2Gw=
+			</data>
+			<key>hash2</key>
+			<data>
+			fiOPwPIWFUUWu0Pj4WoRvajifuDJyUeLbJvpCSMiHmY=
 			</data>
 		</dict>
 		<key>SimpleLineIcons.ttf</key>
@@ -415,6 +491,28 @@
 			<key>hash2</key>
 			<data>
 			P1Ad2wXHCCm7tRz+nKn/9X854GBFfCV7PM8l33Z/CHA=
+			</data>
+		</dict>
+		<key>System San Francisco Display Bold.ttf</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			+7Xnd6A5a9pAnYC9nJS5Ov6WPM4=
+			</data>
+			<key>hash2</key>
+			<data>
+			CSJpmWjWh25vSWKVouoy8moNIHViIg5tZh9Db/QThyA=
+			</data>
+		</dict>
+		<key>System San Francisco Display Regular.ttf</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			04QWrTYYiOjNtb9iZhB+gnEQWV4=
+			</data>
+			<key>hash2</key>
+			<data>
+			I2qtX7ECyTDw43KedPWvuIpkYbhd/tnaJfAmM0fS2EM=
 			</data>
 		</dict>
 		<key>System San Francisco Display Thin.ttf</key>
@@ -459,6 +557,28 @@
 			<key>hash2</key>
 			<data>
 			I2qtX7ECyTDw43KedPWvuIpkYbhd/tnaJfAmM0fS2EM=
+			</data>
+		</dict>
+		<key>SystemSanFranciscoDisplayThin.ttf</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			gfyMbbqIloNK4/P+NumOfCorqRo=
+			</data>
+			<key>hash2</key>
+			<data>
+			ihAn79gPjVC7uxMLI3Ht78nZjL/hz5zEhP9O7rdVjWI=
+			</data>
+		</dict>
+		<key>SystemSanFranciscoDisplayUltralight.ttf</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			n8tGIgzw28wmbzpQ5D7vxmMK2Gw=
+			</data>
+			<key>hash2</key>
+			<data>
+			fiOPwPIWFUUWu0Pj4WoRvajifuDJyUeLbJvpCSMiHmY=
 			</data>
 		</dict>
 		<key>Zocial.ttf</key>
