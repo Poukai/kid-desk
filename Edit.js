@@ -46,6 +46,10 @@ class Edit extends Component {
       .navigation
       .navigate('Control', {connected_peripheral: this.props.navigation.state.params.connected_peripheral })
   }
+  sendCommandStop = (cmd) => {
+    const a = sendCommand(this.props.navigation.state.params.connected_peripheral, cmd);
+    console.log(a)
+  }
   render() {
     const height = this.state.height;
     console.log(height);
@@ -61,7 +65,10 @@ class Edit extends Component {
                 position:'relative'}}>
               <TouchableHighlight
                 style={styles.arrowCircle}
-                onPress={() => {
+                onPressOut={() => {
+                  this.sendCommandStop(Commands.STOP)
+                }}
+                onPressIn={() => {
                 this.handleClickMovement(Commands.UP)
               }}
                 underlayColor={blue}>
@@ -78,8 +85,11 @@ class Edit extends Component {
               <Text style={styles.heightText}>{height.toString()}</Text>
               <TouchableHighlight
                 style={styles.arrowCircle}
-                onPress={() => {
+                onPressIn={() => {
                 this.handleClickMovement(Commands.DOWN)
+              }}
+              onPressOut={() => {
+                this.sendCommandStop(Commands.STOP)
               }}
                 underlayColor={blue}>
                 <Image

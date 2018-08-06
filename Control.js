@@ -133,28 +133,28 @@ class Control extends Component {
     return (
       <View style={styles.mainContainer}>
         <Grid>
-
         <Row style={styles.buttonsRow}>
           <Button
             onPress={()=>{this.switchProfile("A")}}
-            title="Profile A"
+            title="A"
             buttonStyle={[styles.settingsButton,this.state.userId == "A" ? styles.activeButton : styles.inactiveButton]}
             textStyle={this.state.userId == "A" ? styles.activeButtonText : styles.inactiveButtonText}
             transparent/>
           <Button
             onPress={()=>{this.switchProfile("B")}}
-            title="Profile B"
+            title="B"
             textStyle={this.state.userId == "B" ? styles.activeButtonText : styles.inactiveButtonText}
             buttonStyle={[styles.settingsButton,this.state.userId == "B" ? styles.activeButton : styles.inactiveButton]}
             transparent/>
           <Button
             leftIcon={{
             name: 'settings'
-          }}onPress={this.gotoSettings}
+          }}
+          onPress={this.gotoSettings}
             transparent
-            buttonStyle={styles.settingsButton}
+            buttonStyle={styles.settingsButtonBig}
             title='Settings'/></Row>
-          <Row>
+          <Row style={styles.controlsRow}>
             <Col
               style={[styles.arrowBlockExtreme]}>
               <TouchableHighlight
@@ -182,7 +182,7 @@ class Control extends Component {
 
             </Col>
             </Row>
-            <Row>
+            <Row style={styles.controlsRow2}>
             <Col style={[styles.arrowBlockExtreme,styles.arrowBlockExtremeSecond]}>
               <TouchableHighlight
                 style={styles.arrowCircleBig}
@@ -214,14 +214,22 @@ class Control extends Component {
   }
 }
 const styles = StyleSheet.create({
+  settingsButtonBig:{
+    marginTop:25,
+    marginLeft:30,
+  },
   settingsButton: {
-    borderRadius: 10,
-    borderColor: "#fff",
+    width:70,
+    height:36,
+    borderRadius: 18,
+    borderColor: "#414141",
     borderWidth: 1,
     marginTop:30,
+    backgroundColor:"#414141"
   },
   buttonsRow :{
     height:80,
+    marginBottom:20
   },
   arrowBlockCutsom: {
     marginRight: 0
@@ -238,7 +246,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     height: 70
   },
-  activeButton:{borderColor:blue,},
+  activeButton:{backgroundColor:blue,borderColor:blue},
   inactiveButton:{},
   mainContainer: {
     backgroundColor: '#222',
@@ -279,18 +287,22 @@ const styles = StyleSheet.create({
     marginLeft: 14,
     marginRight: 14,
     flex: 1,
-    marginTop:20,
     alignItems: 'center',
     justifyContent: 'center'
   },
   arrowBlockExtremeSecond: {
-    marginTop: 10
   },
   inactiveButtonText:{
     
   },
+  controlsRow:{
+    marginTop:30,
+  },
+  controlsRow2:{
+    marginTop:-40,
+  },
   activeButtonText:{
-    color:blue
+    color:"#fff"
   }
 });
 

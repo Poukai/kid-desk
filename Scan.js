@@ -134,6 +134,7 @@ class Scan extends Component {
           .getConnectedPeripherals([])
           .then((peripheralsArray) => {
             // Success code
+            console.log(peripheralsArray);
             if (peripheralsArray.length > 0 && peripheralsArray[0].name === "KidDesk") {
               this.connect(peripheralsArray[0].id)
             }
@@ -171,7 +172,7 @@ class Scan extends Component {
           name: peripheral.name // descriptive name given to the peripheral
         });
         if (peripheral.name == "KidDesk") {
-          // this.selectKidDesk(peripheral)
+          this.selectKidDesk(peripheral)
         }
       }
       this.peripherals = peripherals; // update the array of peripherals
@@ -214,6 +215,7 @@ class Scan extends Component {
   }
 
   handleButton = () => {
+    this.startScan()
     for (var i in this.peripherals) {
       if (this.peripherals[i].name == "KidDesk") {
         // this.selectKidDesk(this.peripherals[i])
@@ -245,7 +247,7 @@ class Scan extends Component {
             data={this.state.deviceList}
             style={styles.deviceList}
             keyExtractor={(item, index) => index.toString()}
-            renderItem={({item}) => <TouchableHighlight underlayColor={blue} onPress={()=>{this.selectDevice(item.id)}} style={styles.deviceListItem} key={item.id}><Text>{item.id}{item.name}</Text></TouchableHighlight>}/>}
+            renderItem={({item}) => <TouchableHighlight underlayColor={blue} onPress={()=>{this.selectDevice(item.id)}} style={styles.deviceListItem} key={item.id}><Text> {item.name}</Text></TouchableHighlight>}/>}
           <Button
             onPress={this.handleButton}
             buttonStyle={styles.openBTsettings}

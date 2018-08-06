@@ -48,7 +48,6 @@ class Home extends Component {
     this.checkAuth();
   }
   checkAuth=()=>{
-    this.props.navigation.navigate('Scan');
     let storage = async() => await AsyncStorage.getItem('auth');
     storage().then((res) => {
       if (res) {
@@ -63,14 +62,13 @@ class Home extends Component {
   }
   validate = (text) => {
     console.log(text);
-    let reg = /\S+@\S+/;
+    let reg = /\S+@\S.+/;
     if (reg.test(text) === false) {
       console.log("Email is Not Correct");
       this.setState({validate: false, email: text})
       return false;
     } else {
       this.setState({validate: true, email: text})
-      Keyboard.dismiss()
       console.log("Email is Correct");
     }
   }
