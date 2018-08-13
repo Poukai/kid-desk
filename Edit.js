@@ -66,7 +66,7 @@ class Edit extends Component {
               <TouchableHighlight
                 style={styles.arrowCircle}
                 onPressOut={() => {
-                  this.sendCommandStop(Commands.STOP)
+                  setTimeout(this.sendCommandStop(Commands.STOP),2000);
                 }}
                 onPressIn={() => {
                 this.handleClickMovement(Commands.UP)
@@ -89,7 +89,7 @@ class Edit extends Component {
                 this.handleClickMovement(Commands.DOWN)
               }}
               onPressOut={() => {
-                this.sendCommandStop(Commands.STOP)
+                setTimeout(this.sendCommandStop(Commands.STOP),2000);
               }}
                 underlayColor={blue}>
                 <Image

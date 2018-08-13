@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, Text, Image, StyleSheet, TouchableHighlight , Platform} from "react-native";
+import {View, Text, Image, StyleSheet, TouchableHighlight , Platform ,AsyncStorage,Alert} from "react-native";
 import {Col, Row, Grid} from "react-native-easy-grid";
 import {Icon, Button} from 'react-native-elements'
 import Dimensions from 'Dimensions';
@@ -9,31 +9,85 @@ import {sendCommand} from "./Scan";
 import {connect} from 'react-redux';
 import {getHeight} from './actions/index'
 import {bindActionCreators} from 'redux';
+import { BackHandler } from 'react-native';
+import PouchDB from 'pouchdb-react-native'
+
+const localDB = new PouchDB('myDB')
+
 const blue = "#00A7F7";
 const fontFamily = Platform.OS === "ios"
   ? "System"
-  : "SFProDisplay"
+  : "SFProDisplay-Regular"
 class Moving extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      height
+      height,
     };
   }
   componentWillMount() {
-    this.setState({height : this.props.navigation.state.params.height});
+    // this.setState({height : this.props.navigation.state.params.height});
   }
+  
+componentDidMount() {
+  BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressed);
+}
 
+componentWillUnmount() {
+  BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressed);
+}
+
+onBackButtonPressed() {
+  return true;
+}
   handleClickMovement() {
     console.log("test");
   }
-  stopMovement = () => {
-    this
-      .props
-      .navigation
-      .navigate('Control', {connected_peripheral: this.props.navigation.state.params.connected_peripheral})
-    const a = sendCommand(this.props.navigation.state.params.connected_peripheral, Commands.STOP);
+  stopMovement = async () => {
+    console.log(this.props.navigation.state.params.cmd.Command);
+      let save_position_command = Commands.SAVE_POS2;
+      let key="POS2";
+      if(this.props.navigation.state.params.profile == "A" && this.props.navigation.state.params.cmd.Command == "UP" ){
+        save_position = Commands.SAVE_POS2;
+        key="POS2";
+      }
+      else if(this.props.navigation.state.params.profile == "A" && this.props.navigation.state.params.cmd.Command == "DOWN" ){
+        save_position = Commands.SAVE_POS1;
+        key="POS1";
+      }
+      else if(this.props.navigation.state.params.profile == "B" && this.props.navigation.state.params.cmd.Command == "UP" ){
+        save_position = Commands.SAVE_POS4;
+        key="POS4";
+      }
+      else if(this.props.navigation.state.params.profile == "B" && this.props.navigation.state.params.cmd.Command == "DOWN" ){
+        save_position = Commands.SAVE_POS3;
+        key="POS3";
+      }
+      const obj = {
+        height : this.state.height,
+        profile : this.props.navigation.state.params.profile
+      };
+      console.log("check here1");
+      try {
+        var doc = await localDB.get(key);
+        var response = await localDB.put({
+          _id: key,
+          _rev: doc._rev,
+          obj : obj
+        });
+      } catch (err) {
+        console.log(err);
+      }
+      console.log("check here2");
+      console.log("saved Data ===="+response);
+      const a = sendCommand(this.props.navigation.state.params.connected_peripheral, Commands.STOP);
+      sendCommand(this.props.navigation.state.params.connected_peripheral, save_position_command);
+      this
+        .props
+        .navigation
+        .navigate('Control', {connected_peripheral: this.props.navigation.state.params.connected_peripheral})
     // console.log(a)
+    console.log("check here3");
     
   }
   componentWillReceiveProps(nextProps) {
@@ -44,8 +98,18 @@ class Moving extends Component {
   render() {
     const height = this.state.height;
     console.log(height);
+    const image = "./images/up-mini.png";
+    const text = "up";
+    // if(this.props.navigation.state.params.cmd.Command=="POS1" || this.props.navigation.state.params.cmd.Command=="POS2"){
+    //     const image = "./images/up-mini.png";
+    //     const text = "up";
+    // }
+    // else if(this.props.navigation.state.params.cmd.Command=="POS3" || this.props.navigation.state.params.cmd.Command=="POS4"){
+    //   const image = "./images/down-mini.png";
+    //     const text = "down";
+    // }
     return (
-      <View style={styles.mainContainer}>
+      <TouchableHighlight transparent style={styles.mainContainer} onPress={this.stopMovement}>
         <Grid>
           <Row>
             <Col
@@ -55,17 +119,16 @@ class Moving extends Component {
               justifyContent: 'center',
               position: 'relative'
             }}>
-              <Text style={styles.arrowText}>Desk is moving {this.props.navigation.state.params.cmd.Command=="UP" ?"up" : "down"}...</Text>
+              <Text style={styles.arrowText}>Desk is moving {text}...</Text>
+              {/* <Image source={require(image)}/> */}
               <Text style={styles.heightText}>{height.toString()}</Text>
-              <TouchableHighlight
-                onPress={this.stopMovement}
-                transparent>
+              <View>
                 <Text style={styles.stopText}>Tap to Stop</Text>
-                </TouchableHighlight>
+                </View>
             </Col>
           </Row>
         </Grid>
-      </View>
+      </TouchableHighlight>
     );
   }
 }
@@ -102,7 +165,7 @@ const styles = StyleSheet.create({
     fontFamily: "SFProDisplay-Thin",
   },
   stopText:{
-    color: '#D8D8D8',
+    color: '#9B9B9B',
     fontSize: 22,
     marginTop:50,
     marginLeft:"auto",

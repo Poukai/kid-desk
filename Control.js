@@ -8,9 +8,9 @@ import {
   Dimensions,
   Keyboard,
   TextInput,
-  TouchableOpacity,
   TouchableHighlight,
   Text,
+  TouchableOpacity,
   AsyncStorage,
   ActivityIndicator,
   ScrollView,
@@ -30,9 +30,16 @@ var Buffer = require('buffer/').Buffer
 import {Col, Row, Grid} from "react-native-easy-grid";
 import {Commands} from "./config";
 import {sendCommand} from "./Scan";
+import {LocalDatabase} from './localdatabase';
+import PouchDB from 'pouchdb-react-native'
 
-console.log(global.storage);
-const storage = global.storage;
+const localDB = new PouchDB('myDB')
+console.log(localDB.adapter)
+
+AsyncStorage.getAllKeys()
+  .then(keys => AsyncStorage.multiGet(keys))
+  .then(items => console.log('all pure Items', items))
+  .catch(error => console.warn('error get all Items', error))
 // import {bleManagerEmitter} from "./Scan";
 
 const {width, height} = Dimensions.get('window');
@@ -46,21 +53,22 @@ class Control extends Component {
     };
   }
   handleClickMovement = (cmd) => {
-    console.log(this.state.height);
+    console.log(cmd);
+    sendCommand(this.props.navigation.state.params.connected_peripheral, cmd);
     this.state.height && this
       .props
       .navigation
       .navigate('Moving', {
         connected_peripheral: this.props.navigation.state.params.connected_peripheral,
-        cmd,
+        cmd : cmd,
+        profile:this.state.userId,
         height: this.state.height
       });
-    sendCommand(this.props.navigation.state.params.connected_peripheral, cmd);
 
   }
 
   handleLongPress = (cmd) => {
-    console.log(this.state.height);
+    console.log(cmd);
     this.state.height && this
       .props
       .navigation
@@ -69,7 +77,7 @@ class Control extends Component {
         cmd,
         height: this.state.height
       });
-    sendCommand(this.props.navigation.state.params.connected_peripheral, cmd);
+    
   }
   getDeskHeight = (id,command) => {
     BleManager
@@ -129,11 +137,49 @@ class Control extends Component {
     })
     console.log(profile);
   }
+  movemendCommand= async (direction)=>{
+    
+    const cmd = await this.switchCommandCheckStorage(direction);
+    this.handleClickMovement(cmd);
+  }
+  switchCommandCheckStorage=async (direction)=>{
+    let storageKey= "POS2";
+    if(this.state.userId == "A" && direction == "up" ){
+      // POS2
+      storageKey= "POS2";
+    }
+    else if(this.state.userId == "A" && direction == "down" ){
+      // POS1
+      storageKey= "POS1";
+    }
+    else if(this.state.userId == "B" && direction == "up" ){
+      // POS4
+      storageKey= "POS4";
+    }
+    else if(this.state.userId == "B" && direction == "down" ){
+      // POS3
+      storageKey= "POS3";
+    }
+    console.log("Control switchCommandCheckStorage storageKey begin01 ",storageKey);
+    let positionStorage = null;
+    try {
+      const doc = await db.get(storageKey);
+      console.log(doc);
+      positionStorage = doc;
+      return Commands[storageKey];
+    } catch (err) {
+      if(direction == "up")
+        return Commands.UP;
+    if(direction == "down")
+        return Commands.DOWN;
+    }
+  }
   render() {
     return (
       <View style={styles.mainContainer}>
         <Grid>
         <Row style={styles.buttonsRow}>
+        <Text style={styles.profileText}>Profile</Text>
           <Button
             onPress={()=>{this.switchProfile("A")}}
             title="A"
@@ -144,8 +190,9 @@ class Control extends Component {
             onPress={()=>{this.switchProfile("B")}}
             title="B"
             textStyle={this.state.userId == "B" ? styles.activeButtonText : styles.inactiveButtonText}
-            buttonStyle={[styles.settingsButton,this.state.userId == "B" ? styles.activeButton : styles.inactiveButton]}
+            buttonStyle={[styles.settingsButton,styles.settingsButton2,this.state.userId == "B" ? styles.activeButton : styles.inactiveButton]}
             transparent/>
+            <View style={{flex:1}}>
           <Button
             leftIcon={{
             name: 'settings'
@@ -153,20 +200,25 @@ class Control extends Component {
           onPress={this.gotoSettings}
             transparent
             buttonStyle={styles.settingsButtonBig}
-            title='Settings'/></Row>
+            title='Settings'/>
+            </View>
+          </Row>
+
+
           <Row style={styles.controlsRow}>
-            <Col
+            <TouchableOpacity
+              onPress={ () => {
+                  this.movemendCommand("down");
+            }}
+          //   onLongPress={() => {
+          //   const commandHighPoint = this.state.userId=="A" ? Commands.SAVE_POS1 : Commands.SAVE_POS2
+          //   this.handleLongPress(commandHighPoint)
+          // }}
+          >
+            <View
               style={[styles.arrowBlockExtreme]}>
-              <TouchableHighlight
-                style={styles.arrowCircleBig}
-                onPress={() => {
-                this.handleClickMovement(Commands.DOWN)
-              }}
-                onLongPress={() => {
-                const commandHighPoint = this.state.userId=="A" ? Commands.SAVE_POS1 : Commands.SAVE_POS2
-                this.handleLongPress(commandHighPoint)
-              }}
-                underlayColor={blue}>
+              <View
+            style={styles.arrowCircleBig}>
                 <Image
                   style={{
                   width: 35,
@@ -176,24 +228,26 @@ class Control extends Component {
                   marginTop: 14,
                   position: 'relative'
                 }}
-                  source={require('./images/Sitdown.png')}/></TouchableHighlight>
+                  source={require('./images/Sitdown.png')}/></View>
               <Text style={styles.arrowText}>Sit down</Text>
               <Text style={styles.arrowTextBottom}>Tap and hold Icon to edit</Text>
-
-            </Col>
+                </View>
+            </TouchableOpacity>
             </Row>
-            <Row style={styles.controlsRow2}>
-            <Col style={[styles.arrowBlockExtreme,styles.arrowBlockExtremeSecond]}>
-              <TouchableHighlight
-                style={styles.arrowCircleBig}
-                onPress={() => {
-                this.handleClickMovement(Commands.UP)
-              }}
-                onLongPress={() => {
-                  const commandLowPoint = this.state.userId=="A" ? Commands.SAVE_POS4 : Commands.SAVE_POS3
-                  this.handleLongPress(commandLowPoint)
-              }}
-                underlayColor={blue}>
+
+              <Row style={styles.controlsRow2}>
+            <TouchableOpacity 
+             onPress={() => {
+              this.movemendCommand("up");
+            }}
+          //   onLongPress={() => {
+          //     const commandLowPoint = this.state.userId=="A" ? Commands.SAVE_POS4 : Commands.SAVE_POS3
+          //     this.handleLongPress(commandLowPoint)
+          // }}
+          >
+            <View style={[styles.arrowBlockExtreme]}>
+              <View
+                style={styles.arrowCircleBig}>
                 <Image
                   style={{
                   width: 35,
@@ -203,11 +257,13 @@ class Control extends Component {
                   marginTop: 14,
                   position: 'relative'
                 }}
-                  source={require('./images/Standup.png')}/></TouchableHighlight>
+                  source={require('./images/Standup.png')}/></View>
               <Text style={styles.arrowText}>Stand Up</Text>
               <Text style={styles.arrowTextBottom}>Tap and hold Icon to edit</Text>
-            </Col>
-          </Row>
+            </View>
+          </TouchableOpacity>
+              </Row>
+
         </Grid>
       </View>
     );
@@ -215,8 +271,10 @@ class Control extends Component {
 }
 const styles = StyleSheet.create({
   settingsButtonBig:{
-    marginTop:25,
-    marginLeft:30,
+    marginTop:19,
+    marginRight:-5,
+    alignSelf:'flex-end',
+    justifyContent: 'flex-end'
   },
   settingsButton: {
     width:70,
@@ -224,12 +282,25 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     borderColor: "#414141",
     borderWidth: 1,
-    marginTop:30,
+    marginRight:-30,
+    marginTop:25,
     backgroundColor:"#414141"
+  },
+  settingsButton2:{
+    marginLeft:5
+  },
+  profileText:{
+    color:'#fff',
+    fontSize:18,
+    marginTop:30,
+    marginLeft:14,
   },
   buttonsRow :{
     height:80,
-    marginBottom:20
+    minWidth:width,
+    width:width,
+    flexWrap: 'wrap',
+    
   },
   arrowBlockCutsom: {
     marginRight: 0
@@ -259,18 +330,18 @@ const styles = StyleSheet.create({
     top: 0
   },
   arrowText: {
-    color: "#d5d5d5",
+    color: "#9B9B9B",
     zIndex: 10000,
     marginTop: 9,
     fontSize:20,
     fontFamily:"SFProDisplay-Regular"
   },
   arrowTextBottom: {
-    color: "#d5d5d5",
+    color: "#9B9B9B",
     zIndex: 10000,
     position: 'absolute',
-    fontSize:12,
-    bottom: 10,
+    fontSize:14,
+    bottom: 13,
     marginLeft: "auto",
     marginRight: "auto",
     left: 0,
@@ -280,13 +351,14 @@ const styles = StyleSheet.create({
   },
   arrowBlockExtreme: {
     backgroundColor: '#000000',
-    textAlign: 'center',
-    width: 30,
-    height: 250,
+    width: width-30,
+    maxHeight: (height-110)/2,
+    height:(height-110)/2,
     borderRadius: 20,
     marginLeft: 14,
     marginRight: 14,
     flex: 1,
+    position:"relative",
     alignItems: 'center',
     justifyContent: 'center'
   },
@@ -296,10 +368,9 @@ const styles = StyleSheet.create({
     
   },
   controlsRow:{
-    marginTop:30,
+    marginTop:5,
   },
   controlsRow2:{
-    marginTop:-40,
   },
   activeButtonText:{
     color:"#fff"

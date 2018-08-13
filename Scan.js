@@ -34,11 +34,12 @@ const ACCOUNT = 'id'
 const DEVICE_NAME_DESK = "DeskBLE"
 const fontFamily = Platform.OS === "ios"
   ? "System"
-  : "SanFrancisco"
+  : "SFProDisplay-Regular"
 const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule); // create an event emitter for the BLE Manager module
 
 export const sendCommand = (id, command) => {
+  console.log(command);
   BleManager
     .retrieveServices(id)
     .then((peripheralInfo) => {
@@ -276,13 +277,13 @@ const styles = StyleSheet.create({
   },
   headerDesc: {
     fontFamily: fontFamily,
-    fontSize: 17,
+    fontSize: 18,
     color: "#333",
     fontWeight: "normal",
     marginTop: 15,
     textAlign: "center",
-    marginLeft: 15,
-    marginRight: 15,
+    marginLeft: 60,
+    marginRight: 60,
     marginBottom: 40
   },
   bluetoothBox: {

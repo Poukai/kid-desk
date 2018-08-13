@@ -27,7 +27,9 @@ import {Button, FormLabel, FormInput, FormValidationMessage} from 'react-native-
 import {bindActionCreators} from 'redux';
 import BleManager from 'react-native-ble-manager'; // for talking to BLE peripherals
 import localStorage from 'react-native-sync-localstorage';
-
+const {width, height} = Dimensions.get('window');
+ 
+var validator = require("email-validator");
 var Buffer = require('buffer/').Buffer
 
 const blue = "#00A7F7";
@@ -36,14 +38,15 @@ const ACCOUNT = 'id'
 const DEVICE_NAME_DESK = "DeskBLE"
 const fontFamily = Platform.OS === "ios"
   ? "System"
-  : "SanFrancisco"
+  : "SFProDisplay"
 class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
       email: "",
       validate: false,
-      loading: false
+      loading: false,
+      showError:false,
     };
     this.checkAuth();
   }
@@ -61,15 +64,11 @@ class Home extends Component {
     });
   }
   validate = (text) => {
-    console.log(text);
-    let reg = /\S+@\S.+/;
-    if (reg.test(text) === false) {
-      console.log("Email is Not Correct");
-      this.setState({validate: false, email: text})
-      return false;
+    let a = validator.validate(text); // true
+    if (validator.validate(text)) {
+      this.setState({validate: true, email: text,showError : false})
     } else {
-      this.setState({validate: true, email: text})
-      console.log("Email is Correct");
+      this.setState({validate: false, email: text ,showError : true})
     }
   }
   handleButton = () => {
@@ -109,11 +108,13 @@ render() {
       <Text style={styles.headerTitle}>Welcome to Kid Desk</Text>
       <Text style={styles.headerDesc}>Please submit your email before using the app.</Text>
       <View style={styles.bluetoothBox}>
-        <FormLabel>Please enter your Email</FormLabel>
-        <FormInput
-          onChangeText={(text) => this.validate(text)}
-          value={this.state.email}
-          inputStyle={styles.emailField}/>{!this.state.validate && <FormValidationMessage>Please enter a valid Email</FormValidationMessage>}
+          <TextInput
+        style={styles.emailField}
+        onChangeText={(text) => this.validate(text)}
+        value={this.state.email}
+        placeholder="Please enter your Email Address"
+      />
+      {this.state.showError && <FormValidationMessage>Please enter a valid Email</FormValidationMessage>}
         <Button
           onPress={this.handleButton}
           buttonStyle={styles.openBTsettings}
@@ -143,13 +144,13 @@ headerTitle: {
 },
 headerDesc: {
   fontFamily: fontFamily,
-  fontSize: 17,
-  color: "#333",
+  fontSize: 18,
+  color: "#333333",
   fontWeight: "normal",
   marginTop: 15,
   textAlign: "center",
-  marginLeft: 15,
-  marginRight: 15,
+  marginLeft: 60,
+  marginRight: 60,
   marginBottom: 40
 },
 bluetoothBox: {
@@ -159,8 +160,15 @@ bluetoothBox: {
   marginRight: 15
 },
 emailField: {
-  borderBottomWidth: 1,
-  borderColor: "#eee"
+  borderWidth: 2,
+  borderColor: "#eee",
+  paddingRight:10,
+  marginLeft:15,
+  marginRight:15,
+  paddingRight:20,
+  height:50,
+  textAlign:'center',
+  fontSize:18
 },
 deviceList: {
   backgroundColor: '#F0EFF5',
