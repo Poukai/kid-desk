@@ -30,16 +30,25 @@ var Buffer = require('buffer/').Buffer
 import {Col, Row, Grid} from "react-native-easy-grid";
 import {Commands} from "./config";
 import {sendCommand} from "./Scan";
-import {LocalDatabase} from './localdatabase';
 import PouchDB from 'pouchdb-react-native'
 
+import { debounce } from 'lodash';
+import {setItem,getItem} from './localdatabase';
+
+
+const onClickView = funcOnView => {
+  return debounce(funcOnView, 1000, {
+    trailing: false,
+    leading: true
+  });
+};
 const localDB = new PouchDB('myDB')
 console.log(localDB.adapter)
 
-AsyncStorage.getAllKeys()
-  .then(keys => AsyncStorage.multiGet(keys))
-  .then(items => console.log('all pure Items', items))
-  .catch(error => console.warn('error get all Items', error))
+// AsyncStorage.getAllKeys()
+//   .then(keys => AsyncStorage.multiGet(keys))
+//   .then(items => Alert.alert('all pure Items', JSON.stringify(items)))
+//   .catch(error => console.warn('error get all Items', error))
 // import {bleManagerEmitter} from "./Scan";
 
 const {width, height} = Dimensions.get('window');
@@ -49,12 +58,17 @@ class Control extends Component {
     super(props);
     this.state = {
       height,
-      userId : "A"
+      userId : "A",
+      index1:null,
+      index2:null,
+      index3:null,
+      index4:null,
     };
+    
   }
-  handleClickMovement = (cmd) => {
-    console.log(cmd);
-    sendCommand(this.props.navigation.state.params.connected_peripheral, cmd);
+  handleClickMovement = onClickView((cmd) => {
+    console.log("table should move"+cmd);
+    const b = sendCommand(this.props.navigation.state.params.connected_peripheral, cmd);
     this.state.height && this
       .props
       .navigation
@@ -65,9 +79,9 @@ class Control extends Component {
         height: this.state.height
       });
 
-  }
+  })
 
-  handleLongPress = (cmd) => {
+  handleLongPress = onClickView((cmd) => {
     console.log(cmd);
     this.state.height && this
       .props
@@ -78,7 +92,7 @@ class Control extends Component {
         height: this.state.height
       });
     
-  }
+  })
   getDeskHeight = (id,command) => {
     BleManager
     .retrieveServices(id)
@@ -92,8 +106,7 @@ class Control extends Component {
       const data = stringToBytes(tmp);
       BleManager
         .write(id, services[2].uuid, characteristics[6].characteristic, data)
-        .then((readData) => {
-          console.log("readData"+readData)
+        .then(() => {
         })
         .catch((error) => {
           // Failure code
@@ -107,21 +120,30 @@ class Control extends Component {
   
   }
 
-  componentWillMount(){
-    this.getDeskHeight(this.props.navigation.state.params.connected_peripheral,Commands.GET_HEIGHT);
+  getValuesFromDb= async()=>{
+    const key1 = await getItem('1').then((result) => this.setState({ index1: result }));
+    const key2 = await getItem('2').then((result) => this.setState({ index2: result }));
+    const key3 = await getItem('3').then((result) => this.setState({ index3: result }));
+    const key4 = await getItem('4').then((result) => this.setState({ index4: result }));
+    if(this.props.navigation.state.params && this.props.navigation.state.params.index && this.props.navigation.state.params.height){
+      const indexKey =  this.props.navigation.state.params.index;
+      const height = Number(this.props.navigation.state.params.height);
+      this.setState({
+        indexKey:height
+      })
+    }
   }
-
+  componentWillMount(){
+    this.getValuesFromDb();
+    this.getDeskHeight(this.props.navigation.state.params.connected_peripheral,Commands.GET_HEIGHT)
+  }
+  componentDidMount(){
+    this.props.navigation.addListener('willFocus', () => this.getValuesFromDb())
+  }
   componentWillReceiveProps(nextProps) {
     this.setState({
       height: nextProps.height.height
     });
-  }
-  setData = (profile,pos1=70,pos4=70) => {
-   
-    
-
-  }
-  getData = () => {
   }
   gotoSettings=()=>{
     this
@@ -131,66 +153,82 @@ class Control extends Component {
         connected_peripheral: this.props.navigation.state.params.connected_peripheral,
       });
   }
-  switchProfile=(profile)=>{
+  switchProfile=onClickView((profile)=>{
     this.setState({
       userId : profile
     })
     console.log(profile);
+  })
+  movemendCommand= (direction)=>{
+    let cmd="";
+    if(direction == "up")
+    cmd = Commands.UP
+    else if(direction == "down")
+    cmd = Commands.DOWN
+    this.state.height && this
+      .props
+      .navigation
+      .navigate('Moving', {
+        connected_peripheral: this.props.navigation.state.params.connected_peripheral,
+        cmd : cmd,
+        direction:direction,
+        profile:this.state.userId,
+        height: this.state.height
+      });
   }
-  movemendCommand= async (direction)=>{
-    
-    const cmd = await this.switchCommandCheckStorage(direction);
-    this.handleClickMovement(cmd);
+  editDeskHeight=(index)=>{
+    this.state.height && this
+    .props
+    .navigation
+    .navigate('Edit', {
+      connected_peripheral: this.props.navigation.state.params.connected_peripheral,
+      index,
+      height: this.state.height
+    });
   }
-  switchCommandCheckStorage=async (direction)=>{
-    let storageKey= "POS2";
-    if(this.state.userId == "A" && direction == "up" ){
-      // POS2
-      storageKey= "POS2";
-    }
-    else if(this.state.userId == "A" && direction == "down" ){
-      // POS1
-      storageKey= "POS1";
-    }
-    else if(this.state.userId == "B" && direction == "up" ){
-      // POS4
-      storageKey= "POS4";
-    }
-    else if(this.state.userId == "B" && direction == "down" ){
-      // POS3
-      storageKey= "POS3";
-    }
-    console.log("Control switchCommandCheckStorage storageKey begin01 ",storageKey);
-    let positionStorage = null;
-    try {
-      const doc = await db.get(storageKey);
-      console.log(doc);
-      positionStorage = doc;
-      return Commands[storageKey];
-    } catch (err) {
-      if(direction == "up")
-        return Commands.UP;
-    if(direction == "down")
-        return Commands.DOWN;
-    }
+  moveDeskToPosition =(cmd)=>{
+    const direction="up";
+    this.state.height && this
+      .props
+      .navigation
+      .navigate('Moving', {
+        connected_peripheral: this.props.navigation.state.params.connected_peripheral,
+        cmd : cmd,
+        direction:direction,
+        profile:this.state.userId,
+        height: this.state.height
+      });
   }
+  tapAndHoldClick=onClickView((index,command)=>{
+    let key = "index"+index;
+    if(this.state[key]){
+      this.moveDeskToPosition(command);
+    }
+    else{
+    Alert.alert(
+      'Preset height',
+      'Do you want to preset the height point for '+index+' ?',
+      [
+        {text: 'No', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+        {text: 'Yes', onPress: () => {
+          console.log('OK Pressed');
+          this.editDeskHeight(index)
+        }},
+      ],
+      { cancelable: false }
+    )
+  }
+  })
   render() {
     return (
       <View style={styles.mainContainer}>
         <Grid>
         <Row style={styles.buttonsRow}>
-        <Text style={styles.profileText}>Profile</Text>
-          <Button
-            onPress={()=>{this.switchProfile("A")}}
-            title="A"
+            <Button
+            onPress={()=>{AsyncStorage.clear()}}
+            title="Clear"
             buttonStyle={[styles.settingsButton,this.state.userId == "A" ? styles.activeButton : styles.inactiveButton]}
             textStyle={this.state.userId == "A" ? styles.activeButtonText : styles.inactiveButtonText}
-            transparent/>
-          <Button
-            onPress={()=>{this.switchProfile("B")}}
-            title="B"
-            textStyle={this.state.userId == "B" ? styles.activeButtonText : styles.inactiveButtonText}
-            buttonStyle={[styles.settingsButton,styles.settingsButton2,this.state.userId == "B" ? styles.activeButton : styles.inactiveButton]}
             transparent/>
             <View style={{flex:1}}>
           <Button
@@ -203,17 +241,69 @@ class Control extends Component {
             title='Settings'/>
             </View>
           </Row>
-
-
+          
+          <Row style={styles.controlsRow2}>
+            <TouchableOpacity 
+             onPress={() => {
+              this.movemendCommand("up");
+            }}
+          >
+            <View style={[styles.arrowBlockExtreme]}>
+              <View
+                style={styles.arrowCircleBig}>
+                <Image
+                  style={{
+                  width: 40,
+                  marginTop: -4,
+                  alignItems: "center",
+                  alignSelf: "center",
+                  position: 'relative'
+                }}
+                resizeMode="contain"
+                  source={require('./images/Moveup.png')}/></View>
+              <Text style={styles.arrowText}>Up</Text>
+            </View>
+          </TouchableOpacity>
+          <Col>
+          <Row>
+          <TouchableOpacity 
+             onPress={() => {
+              this.tapAndHoldClick(1,Commands.POS1);
+            }}
+            onLongPress={() => {
+              this.editDeskHeight(1);
+            }}
+          >
+            <View style={[styles.arrowBlockSmall]}>
+              <Text style={styles.arrowBlockSmallText}>1</Text>
+              <Text style={styles.arrowBlockSmalHeight}>{this.state.index1}</Text>
+              <Text style={styles.arrowBlockSmallTapHoldText}>{this.state.index1 ? "Tap and hold to edit" : "Tap and hold to create"}</Text>
+            </View>
+          </TouchableOpacity>
+          </Row>
+          <Row>
+          <TouchableOpacity 
+             onPress={() => {
+              this.tapAndHoldClick(2,Commands.POS2);
+            }}
+            onLongPress={() => {
+              this.editDeskHeight(2);
+            }}
+          >
+            <View style={[styles.arrowBlockSmall]}>
+              <Text style={styles.arrowBlockSmallText}>2</Text>
+              <Text style={styles.arrowBlockSmalHeight}>{this.state.index2}</Text>
+              <Text style={styles.arrowBlockSmallTapHoldText}>{this.state.index2 ? "Tap and hold to edit" : "Tap and hold to create"}</Text>
+            </View>
+          </TouchableOpacity>
+          </Row>
+            </Col>
+              </Row>
           <Row style={styles.controlsRow}>
             <TouchableOpacity
               onPress={ () => {
                   this.movemendCommand("down");
             }}
-          //   onLongPress={() => {
-          //   const commandHighPoint = this.state.userId=="A" ? Commands.SAVE_POS1 : Commands.SAVE_POS2
-          //   this.handleLongPress(commandHighPoint)
-          // }}
           >
             <View
               style={[styles.arrowBlockExtreme]}>
@@ -221,48 +311,56 @@ class Control extends Component {
             style={styles.arrowCircleBig}>
                 <Image
                   style={{
-                  width: 35,
-                  height: 50,
+                    width: 40,
                   alignItems: "center",
                   alignSelf: "center",
-                  marginTop: 14,
+                  marginTop: -4,
                   position: 'relative'
                 }}
-                  source={require('./images/Sitdown.png')}/></View>
-              <Text style={styles.arrowText}>Sit down</Text>
-              <Text style={styles.arrowTextBottom}>Tap and hold Icon to edit</Text>
+                resizeMode="contain"
+                  source={require('./images/Movedown.png')}/></View>
+              <Text style={styles.arrowText}>Down</Text>
                 </View>
             </TouchableOpacity>
-            </Row>
-
-              <Row style={styles.controlsRow2}>
-            <TouchableOpacity 
+          
+            <Col>
+          <Row>
+          <TouchableOpacity 
              onPress={() => {
-              this.movemendCommand("up");
+              this.tapAndHoldClick(3,Commands.POS3);
             }}
-          //   onLongPress={() => {
-          //     const commandLowPoint = this.state.userId=="A" ? Commands.SAVE_POS4 : Commands.SAVE_POS3
-          //     this.handleLongPress(commandLowPoint)
-          // }}
+            onLongPress={() => {
+              this.editDeskHeight(3);
+            }}
           >
-            <View style={[styles.arrowBlockExtreme]}>
-              <View
-                style={styles.arrowCircleBig}>
-                <Image
-                  style={{
-                  width: 35,
-                  height: 50,
-                  alignItems: "center",
-                  alignSelf: "center",
-                  marginTop: 14,
-                  position: 'relative'
-                }}
-                  source={require('./images/Standup.png')}/></View>
-              <Text style={styles.arrowText}>Stand Up</Text>
-              <Text style={styles.arrowTextBottom}>Tap and hold Icon to edit</Text>
+            <View style={[styles.arrowBlockSmall]}>
+              <Text style={styles.arrowBlockSmallText}>3</Text>
+              <Text style={styles.arrowBlockSmalHeight}>{this.state.index3}</Text>
+              <Text style={styles.arrowBlockSmallTapHoldText}>{this.state.index3 ? "Tap and hold to edit" : "Tap and hold to create"}</Text>
             </View>
           </TouchableOpacity>
-              </Row>
+              
+          </Row>
+          <Row>
+          <TouchableOpacity 
+             onPress={() => {
+              this.tapAndHoldClick(4,Commands.POS4);
+            }}
+            onLongPress={() => {
+              this.editDeskHeight(4);
+            }}
+          >
+            <View style={[styles.arrowBlockSmall]}>
+              <Text style={styles.arrowBlockSmallText}>4</Text>
+              <Text style={styles.arrowBlockSmalHeight}>{this.state.index4}</Text>
+              <Text style={styles.arrowBlockSmallTapHoldText}>{this.state.index4 ? "Tap and hold to edit" : "Tap and hold to create"}</Text>
+            </View>
+          </TouchableOpacity>
+          </Row>
+            </Col>
+            </Row>
+
+              
 
         </Grid>
       </View>
@@ -297,10 +395,6 @@ const styles = StyleSheet.create({
   },
   buttonsRow :{
     height:80,
-    minWidth:width,
-    width:width,
-    flexWrap: 'wrap',
-    
   },
   arrowBlockCutsom: {
     marginRight: 0
@@ -351,16 +445,52 @@ const styles = StyleSheet.create({
   },
   arrowBlockExtreme: {
     backgroundColor: '#000000',
-    width: width-30,
+    width: 145,
     maxHeight: (height-110)/2,
     height:(height-110)/2,
     borderRadius: 20,
     marginLeft: 14,
+    marginRight: 9,
+    flex: 1,
+    position:"relative",
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  arrowBlockSmall:{
+    backgroundColor: '#000000',
+    width: width-34-145,
+    maxHeight: (height-140)/4,
+    height:(height-140)/4,
+    borderRadius: 20,
     marginRight: 14,
     flex: 1,
     position:"relative",
     alignItems: 'center',
     justifyContent: 'center'
+  },
+  arrowBlockSmallText :{
+    fontSize: 50,
+    color:'#9B9B9B',
+    position:"relative",
+    top:-10,
+  },
+  arrowBlockSmallTapHoldText : {
+    position:'absolute',
+    bottom:7,
+    left:0,
+    right:0,
+    color:"#9B9B9B",
+    fontSize:12,
+    textAlign:'center',
+  },
+  arrowBlockSmalHeight:{
+    position:'absolute',
+    top:10,
+    right:14,
+    color:"#9B9B9B",
+    fontSize:16,
+    textAlign:'center',
+
   },
   arrowBlockExtremeSecond: {
   },
@@ -371,6 +501,7 @@ const styles = StyleSheet.create({
     marginTop:5,
   },
   controlsRow2:{
+    marginTop:0,
   },
   activeButtonText:{
     color:"#fff"

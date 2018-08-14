@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, Text, Image, StyleSheet, TouchableHighlight , Platform ,AsyncStorage,Alert} from "react-native";
+import {View, Text, Image, StyleSheet, TouchableHighlight , Platform ,AsyncStorage,Alert, BackHandler} from "react-native";
 import {Col, Row, Grid} from "react-native-easy-grid";
 import {Icon, Button} from 'react-native-elements'
 import Dimensions from 'Dimensions';
@@ -9,8 +9,16 @@ import {sendCommand} from "./Scan";
 import {connect} from 'react-redux';
 import {getHeight} from './actions/index'
 import {bindActionCreators} from 'redux';
-import { BackHandler } from 'react-native';
 import PouchDB from 'pouchdb-react-native'
+import { debounce } from 'lodash';
+import {setItem,getItem} from './localdatabase';
+
+const onClickView = funcOnView => {
+  return debounce(funcOnView, 2000, {
+    trailing: false,
+    leading: true
+  });
+};
 
 const localDB = new PouchDB('myDB')
 
@@ -25,8 +33,38 @@ class Moving extends Component {
       height,
     };
   }
+  moveDeskBasedOnPosition = async () =>{
+    let save_position_command = Commands.SAVE_POS2;
+      let key="POS2";
+      if(this.props.navigation.state.params.profile == "A" && this.props.navigation.state.params.cmd.Command == "UP" ){
+        save_position_command = Commands.SAVE_POS2;
+        key="POS2";
+      }
+      else if(this.props.navigation.state.params.profile == "A" && this.props.navigation.state.params.cmd.Command == "DOWN" ){
+        save_position_command = Commands.SAVE_POS1;
+        key="POS1";
+      }
+      else if(this.props.navigation.state.params.profile == "B" && this.props.navigation.state.params.cmd.Command == "UP" ){
+        save_position_command = Commands.SAVE_POS4;
+        key="POS4";
+      }
+      else if(this.props.navigation.state.params.profile == "B" && this.props.navigation.state.params.cmd.Command == "DOWN" ){
+        save_position_command = Commands.SAVE_POS3;
+        key="POS3";
+      }
+      const d = await getItem(key);
+      if(d){
+        sendCommand(this.props.navigation.state.params.connected_peripheral, Commands[key]);
+      }
+      else{
+        sendCommand(this.props.navigation.state.params.connected_peripheral, this.props.navigation.state.params.cmd);
+      }
+  }
   componentWillMount() {
+    sendCommand(this.props.navigation.state.params.connected_peripheral, this.props.navigation.state.params.cmd);
+    // this.moveDeskBasedOnPosition()
     // this.setState({height : this.props.navigation.state.params.height});
+    
   }
   
 componentDidMount() {
@@ -43,51 +81,49 @@ onBackButtonPressed() {
   handleClickMovement() {
     console.log("test");
   }
+  HandlestopMovement= onClickView((event)=>{
+    const a = sendCommand(this.props.navigation.state.params.connected_peripheral, Commands.STOP);
+    this.props.navigation.navigate('Control', {connected_peripheral: this.props.navigation.state.params.connected_peripheral});
+    //  this.stopMovement()
+  })
   stopMovement = async () => {
-    console.log(this.props.navigation.state.params.cmd.Command);
+    const a = sendCommand(this.props.navigation.state.params.connected_peripheral, Commands.STOP);
+    
       let save_position_command = Commands.SAVE_POS2;
       let key="POS2";
       if(this.props.navigation.state.params.profile == "A" && this.props.navigation.state.params.cmd.Command == "UP" ){
-        save_position = Commands.SAVE_POS2;
+        save_position_command = Commands.SAVE_POS2;
         key="POS2";
       }
       else if(this.props.navigation.state.params.profile == "A" && this.props.navigation.state.params.cmd.Command == "DOWN" ){
-        save_position = Commands.SAVE_POS1;
+        save_position_command = Commands.SAVE_POS1;
         key="POS1";
       }
       else if(this.props.navigation.state.params.profile == "B" && this.props.navigation.state.params.cmd.Command == "UP" ){
-        save_position = Commands.SAVE_POS4;
+        save_position_command = Commands.SAVE_POS4;
         key="POS4";
       }
       else if(this.props.navigation.state.params.profile == "B" && this.props.navigation.state.params.cmd.Command == "DOWN" ){
-        save_position = Commands.SAVE_POS3;
+        save_position_command = Commands.SAVE_POS3;
         key="POS3";
       }
-      const obj = {
-        height : this.state.height,
-        profile : this.props.navigation.state.params.profile
-      };
-      console.log("check here1");
-      try {
-        var doc = await localDB.get(key);
-        var response = await localDB.put({
-          _id: key,
-          _rev: doc._rev,
-          obj : obj
-        });
-      } catch (err) {
-        console.log(err);
+      let newHeight = this.state.height+"";
+      const c = await  getItem(key);
+      console.log("stopMovement 00000 ---- result = ",c);
+      // console.log(c);
+      if(c){
+        this.props.navigation.navigate('Control', {connected_peripheral: this.props.navigation.state.params.connected_peripheral});
       }
-      console.log("check here2");
-      console.log("saved Data ===="+response);
-      const a = sendCommand(this.props.navigation.state.params.connected_peripheral, Commands.STOP);
-      sendCommand(this.props.navigation.state.params.connected_peripheral, save_position_command);
-      this
-        .props
-        .navigation
-        .navigate('Control', {connected_peripheral: this.props.navigation.state.params.connected_peripheral})
-    // console.log(a)
-    console.log("check here3");
+      else{
+        // let start = Date.now(),
+        // now = start;
+        // while (now - start < 2000) {
+        //   now = Date.now();
+        // }
+        const css = await setItem(key,newHeight);
+        setTimeout(()=>{sendCommand(this.props.navigation.state.params.connected_peripheral, save_position_command);},1000);
+        this.props.navigation.navigate('Control', {connected_peripheral: this.props.navigation.state.params.connected_peripheral})
+      }
     
   }
   componentWillReceiveProps(nextProps) {
@@ -96,10 +132,10 @@ onBackButtonPressed() {
     }, this._storeData);
   }
   render() {
-    const height = this.state.height;
+    let height = this.state.height;
     console.log(height);
-    const image = "./images/up-mini.png";
-    const text = "up";
+    const image = this.props.navigation.state.params.direction == "up" ? require('./images/up-mini.png') : require('./images/down-mini.png');
+    const text = this.props.navigation.state.params.direction;
     // if(this.props.navigation.state.params.cmd.Command=="POS1" || this.props.navigation.state.params.cmd.Command=="POS2"){
     //     const image = "./images/up-mini.png";
     //     const text = "up";
@@ -109,7 +145,7 @@ onBackButtonPressed() {
     //     const text = "down";
     // }
     return (
-      <TouchableHighlight transparent style={styles.mainContainer} onPress={this.stopMovement}>
+      <TouchableHighlight transparent style={styles.mainContainer} onPress={this.HandlestopMovement}>
         <Grid>
           <Row>
             <Col
@@ -119,11 +155,12 @@ onBackButtonPressed() {
               justifyContent: 'center',
               position: 'relative'
             }}>
-              <Text style={styles.arrowText}>Desk is moving {text}...</Text>
-              {/* <Image source={require(image)}/> */}
+              <Text style={styles.stopText}>Desk is moving {text}...</Text>
+              { this.props.navigation.state.params.direction == "up" && <Image source={image} style={styles.arrowImage}/>}
               <Text style={styles.heightText}>{height.toString()}</Text>
+              { this.props.navigation.state.params.direction == "down" && <Image source={image} style={styles.arrowImage}/>}
               <View>
-                <Text style={styles.stopText}>Tap to Stop</Text>
+                <Text style={styles.arrowText}>Tap to Stop</Text>
                 </View>
             </Col>
           </Row>
@@ -167,11 +204,18 @@ const styles = StyleSheet.create({
   stopText:{
     color: '#9B9B9B',
     fontSize: 22,
-    marginTop:50,
+    marginTop:30,
+    marginBottom:10,
     marginLeft:"auto",
     marginRight:"auto",
     fontWeight:"100",
-    fontFamily: "SFProDisplay-Thin",
+    fontFamily: "SFProDisplay-Regular",
+  },
+  arrowImage:{
+    width:30,
+    height:30,
+    marginTop:10,
+    marginBottom:20
   },
   arrowTextBottom: {
     color: "#d5d5d5",

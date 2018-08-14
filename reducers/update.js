@@ -1,11 +1,11 @@
 const initialState = {height:0};
 const update = (state = initialState, action) => {
-  console.log(action);
+  console.log("update.js : "+action.height);
   switch (action.type) {
     case 'UPDATE':
       return {
           ...state, 
-          height: action.height
+          height: Math.floor(Number(action.height))
       }
       case 'GET':
       console.log("GET Called");

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, Text, Image, StyleSheet, TouchableHighlight , Alert} from "react-native";
+import {View, Text, Image, StyleSheet, TouchableHighlight , Alert ,BackHandler} from "react-native";
 import {Col, Row, Grid} from "react-native-easy-grid";
 import {Icon, Button} from 'react-native-elements'
 import Dimensions from 'Dimensions';
@@ -26,10 +26,20 @@ class Settings extends Component {
   this.setState({resetting:true});
   // sendCommand(this.props.navigation.state.params.connected_peripheral, Commands.GET_HEIGHT);
   }
-
+  componentDidMount() {
+    BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressed);
+  }
+  
+  componentWillUnmount() {
+    BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressed);
+  }
+  
+  onBackButtonPressed=()=> {
+    return this.state.resetting;
+  }
   componentWillReceiveProps(nextProps) {
     console.log("HEIGHT "+nextProps.height.height);
-    if(nextProps.height.height == 72){
+    if(nextProps.height.height <= 72){
       this.setState({
         resetting:false,
         done:true,
@@ -63,10 +73,9 @@ class Settings extends Component {
   }
   render() {
     return (
-      <View style={styles.mainContainer}>
+      <View style={styles.mainContainer}  pointerEvents={this.state.resetting ? "none" : "auto"}>
         <Grid>
-        <View style={styles.headerTextView}><TouchableHighlight style={styles.arrowCircleSmall} underlayColor={blue} onPress={this.handleBackPress}><Icon name="chevron-left" size={24} color="#fff" style={styles.headerTextIcon}/></TouchableHighlight><Text style={styles.headerText}>Settings</Text>
-          </View>
+        <View style={styles.headerTextView}><TouchableHighlight style={styles.backIconButton} onPress={this.handleBackPress}><Icon name="chevron-left" size={40} color="#fff" style={styles.headerTextIconback}/></TouchableHighlight><Text style={styles.headerText}>Settings</Text></View>
         <View>
           <Row style={styles.resetBlock}>{this.state.done && <Text style={styles.resetCompletedText}>Reset Completed!</Text>}
               <TouchableHighlight style={styles.resetIconView} onPress={this.handleClickMovement} underlayColor={blue}>
@@ -86,6 +95,10 @@ const styles = StyleSheet.create({
     marginTop: 40,
     width: 220,
   },
+  backIconButton:{
+    position:'relative',
+    zIndex:10000
+  },
   arrowCircle: {
     backgroundColor: '#979797',
     width: 60,
@@ -95,8 +108,35 @@ const styles = StyleSheet.create({
     marginBottom:20
   },
   headerTextView:{
+    marginTop: 20,
+    width:width,
+    marginBottom:10,
+    alignItems: 'flex-start',
+    position:"absolute",
+    flexDirection:'row',
+    paddingLeft:5,
+    maxHeight:80,
+    justifyContent: "space-between",
+  },
+  headerText:{
+    color: "#fff",
+    fontSize:18,
+    justifyContent: "space-between",
+    paddingTop:8,
     position:'absolute',
-    width:width
+    left:0,
+    right:0,
+    textAlign:'center',
+    marginLeft:"auto",
+    marginRight:"auto",
+    alignSelf:"flex-start",
+    alignItems:"flex-start"
+  },
+  headerTextIconback:{
+    position:'relative',
+  },
+  headerTextIcon:{
+    transform: [{ rotate: '90deg'}],
   },
   arrowCircleSmall:{
     backgroundColor: '#979797',
@@ -125,15 +165,6 @@ const styles = StyleSheet.create({
     marginTop: 9,
     marginBottom:10,
     fontSize:18,
-  },
-  headerText:{
-    color: "#fff",
-    fontSize:18,
-    marginTop:20,
-    position:'absolute',
-    left:0,
-    right:0,
-    textAlign:'center'
   },
   resetText:{
     color: "#fff",
@@ -171,7 +202,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems : 'center',
     paddingLeft:8,
-    paddingTop:5
+    paddingTop:5,
   },
   resetBlock:{
     minWidth:'100%',

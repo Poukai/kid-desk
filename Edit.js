@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, Text, Image, StyleSheet, TouchableHighlight , Platform} from "react-native";
+import {View, Text, Image, StyleSheet, TouchableHighlight , Platform , TouchableOpacity ,Alert } from "react-native";
 import {Col, Row, Grid} from "react-native-easy-grid";
 import {Icon, Button} from 'react-native-elements'
 import Dimensions from 'Dimensions';
@@ -8,70 +8,123 @@ import {sendCommand} from "./Scan";
 import {connect} from 'react-redux';
 import {getHeight} from './actions/index'
 import {bindActionCreators} from 'redux';
+import { debounce } from 'lodash';
+import {setItem,getItem} from './localdatabase';
+
+
+
 const blue = "#00A7F7";
 const {width, height} = Dimensions.get('window');
+
+const onClickView = funcOnView => {
+  return debounce(funcOnView, 2000, {
+    trailing: false,
+    leading: true
+  });
+};
+
 class Edit extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      height
+      height,
+      loading:false
     };
   }
   componentWillMount() {
-    this.setState({height : this.props.navigation.state.params.height});
+    this.setState({loading:false});
   }
   componentWillReceiveProps(nextProps) {
+    console.log("componentWillReceiveProps Edit.js = "+nextProps);
+    Alert.alert(JSON.stringify(nextProps));
     this.setState({
       height: nextProps.height.height
     });
   }
-  handleClickMovement = (cmd) => {
-    const a = sendCommand(this.props.navigation.state.params.connected_peripheral, cmd);
-    console.log(a)
-  }
   handleBackPress=()=>{
+    console.log("back");
     this
       .props
       .navigation
       .navigate('Control', {connected_peripheral: this.props.navigation.state.params.connected_peripheral })
   }
-  componentWillMount() {
-    this.setState({height : this.props.navigation.state.params.height});
+  test=()=>{
+    console.log("listener test"+JSON.stringify(this.state));
   }
-  save=()=>{
-    console.log(this.props.navigation.state.params.cmd);
-    const a = sendCommand(this.props.navigation.state.params.connected_peripheral, this.props.navigation.state.params.cmd);
-    this
-      .props
-      .navigation
-      .navigate('Control', {connected_peripheral: this.props.navigation.state.params.connected_peripheral })
+  componentDidMount(){
+    this.props.navigation.addListener('willFocus', () => this.test())
   }
-  sendCommandStop = (cmd) => {
-    const a = sendCommand(this.props.navigation.state.params.connected_peripheral, cmd);
-    console.log(a)
+  handleClickMovement = onClickView((cmd) => {
+    console.log("handleClickMovement begin");
+    sendCommand(this.props.navigation.state.params.connected_peripheral, cmd);
+    console.log("handleClickMovement end");
+    
+  })
+  
+  save= async ()=>{
+    let commandToSend ="";
+     switch (this.props.navigation.state.params.index) {
+      case 1:
+      commandToSend =  Commands.SAVE_POS1;
+        break;
+      case 2:
+      commandToSend = Commands.SAVE_POS2;
+        break;
+      case 3:
+      commandToSend =  Commands.SAVE_POS3;
+        break;
+      case 4:
+      commandToSend =  Commands.SAVE_POS4;
+        break;
+      default:
+        break;
+    }
+    sendCommand(this.props.navigation.state.params.connected_peripheral, commandToSend);
+    const setIndex = await setItem(""+this.props.navigation.state.params.index,this.state.height+"");
+    
+    setTimeout(() =>{
+      const index = this.props.navigation.state.params.index+""
+      const height = this.state.height+""
+     this.setState({ loading: false });
+     this
+    .props
+    .navigation
+    .navigate('Control', {
+        connected_peripheral: this.props.navigation.state.params.connected_peripheral,
+        index:index,
+        height:height
+      })
+    }, 3000)
+    
+  }
+  
+  sendCommandStop = () => {
+    console.log("sendCommandStop begin");
+    
+    sendCommand(this.props.navigation.state.params.connected_peripheral, Commands.STOP);
+    console.log("sendCommandStop end");
   }
   render() {
-    const height = this.state.height;
-    console.log(height);
+    let height = this.state.height;
+    console.log(this.state.loading);
+    // const loadingValue=this.state.loading;
     return (
-      <View style={styles.mainContainer}>
+      <View style={styles.mainContainer} pointerEvents={this.state.loading ? "none" : "auto"}>
         <Grid>
-        <View style={styles.headerTextView}><TouchableHighlight style={styles.arrowCircleSmall} underlayColor={blue} onPress={this.handleBackPress}><Icon name="chevron-left" size={24} color="#fff" style={styles.headerTextIcon}/></TouchableHighlight><Text style={styles.headerText}>Edit sitting point</Text></View>
+        <View style={styles.headerTextView}><TouchableHighlight style={styles.backIconButton} onPress={this.handleBackPress}><Icon name="chevron-left" size={40} color="#fff" style={styles.headerTextIcon}/></TouchableHighlight><Text style={styles.headerText}>Edit sitting point</Text></View>
           <Row>
+            <Text style={styles.arrowBlockSmallText}>Tap and hold on arrow to move</Text>
             <Col style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 position:'relative'}}>
-              <TouchableHighlight
+              <TouchableOpacity
                 style={styles.arrowCircle}
-                onPressOut={() => {
-                  setTimeout(this.sendCommandStop(Commands.STOP),2000);
-                }}
-                onPressIn={() => {
-                this.handleClickMovement(Commands.UP)
-              }}
+                onPressOut={this.sendCommandStop}
+                onPressIn={()=>{this.handleClickMovement(Commands.UP)}}
                 underlayColor={blue}>
+                <View>
                 <Image
                   style={{
                   width: 35,
@@ -81,17 +134,14 @@ class Edit extends Component {
                   marginTop: 14,
                   position: 'relative'
                 }}
-                  source={require('./images/Moveup.png')}/></TouchableHighlight>
+                  source={require('./images/Moveup.png')}/></View></TouchableOpacity>
               <Text style={styles.heightText}>{height.toString()}</Text>
-              <TouchableHighlight
+              <TouchableOpacity
                 style={styles.arrowCircle}
-                onPressIn={() => {
-                this.handleClickMovement(Commands.DOWN)
-              }}
-              onPressOut={() => {
-                setTimeout(this.sendCommandStop(Commands.STOP),2000);
-              }}
+                onPressOut={this.sendCommandStop} 
+                onPressIn={()=>{this.handleClickMovement(Commands.DOWN)}}
                 underlayColor={blue}>
+                <View>
                 <Image
                   style={{
                   width: 35,
@@ -101,10 +151,16 @@ class Edit extends Component {
                   marginTop: 14,
                   position: 'relative'
                 }}
-                  source={require('./images/downArrow.png')}/></TouchableHighlight>
+                  source={require('./images/downArrow.png')}/></View></TouchableOpacity>
             <Button
-              onPress={this.save}
+              onPress={()=>{
+                this.setState({loading:true},()=>{
+                  this.save(); 
+                })
+              }
+            }
               title="Save"
+              loading={this.state.loading}
               buttonStyle={styles.settingsButton}
               backgroundColor="#017DF7"/>
             </Col>
@@ -170,26 +226,48 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom:10,
     display:"flex",
-    flexWrap: 'wrap', 
-    alignItems: 'flex-start',
+    alignItems: 'center',
     flexDirection:'row',
     paddingLeft:5,
+    justifyContent: "space-between",
   },
   headerText:{
     color: "#fff",
     fontSize:18,
+    justifyContent: "space-between",
+    paddingTop:3,
+    position:'absolute',
+    left:0,
+    right:0,
+    textAlign:'center',
+    marginLeft:"auto",
     marginRight:"auto",
-    marginLeft:15,
-    paddingTop:5,
+    alignSelf:"center",
+    alignItems:"center"
   },
   headerTextIcon:{
+    position:'absolute',
+  },
+  backIconButton:{
     position:'relative',
+    zIndex:10000
   },
   arrowTextBottom: {
     color: "#d5d5d5",
     zIndex: 10000,
     position: 'absolute',
     bottom: 10
+  },
+  arrowBlockSmallText:{
+    textAlign:"center",
+    position:"absolute",
+    top:50,
+    left:0,
+    right:0,
+    fontSize:18,
+    color: '#9B9B9B',
+    fontWeight:"100",
+    fontFamily: "SFProDisplay-Regular",
   },
   arrowBlockExtreme: {
     backgroundColor: '#000000',

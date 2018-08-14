@@ -75,7 +75,7 @@ class Home extends Component {
     if (this.state.validate) {
       // api call success
       var data = new FormData();
-      data.append("email", "amit@a.com");
+      data.append("email", this.state.email);
       data.append("password", "123456");
       this.setState({loading: true});
       var xhr = new XMLHttpRequest();
@@ -114,7 +114,7 @@ render() {
         value={this.state.email}
         placeholder="Please enter your Email Address"
       />
-      {this.state.showError && <FormValidationMessage>Please enter a valid Email</FormValidationMessage>}
+      {this.state.showError && <FormValidationMessage>Please enter a valid email</FormValidationMessage>}
         <Button
           onPress={this.handleButton}
           buttonStyle={styles.openBTsettings}

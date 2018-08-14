@@ -39,7 +39,7 @@ const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule); // create an event emitter for the BLE Manager module
 
 export const sendCommand = (id, command) => {
-  console.log(command);
+  console.log("COMMAND SENT TO DEVICE ==> "+JSON.stringify(command));
   BleManager
     .retrieveServices(id)
     .then((peripheralInfo) => {
@@ -53,7 +53,6 @@ export const sendCommand = (id, command) => {
       BleManager
         .write(id, services[2].uuid, characteristics[6].characteristic, data)
         .then(() => {
-          console.log("data")
         })
         .catch((error) => {
           // Failure code
@@ -205,14 +204,23 @@ class Scan extends Component {
     this.connect(id)
   }
   handleUpdateValueForCharacteristic = (data) => {
+    console.log("data.value "+data.value);
+    if(data && data.value){
     let temp = bytesToString(data.value);
     let a = temp+"";
+    console.log("a "+a);
+    if(a.split(",").length>1){
     let b = a.split(",")[1];
+    console.log("b "+b);
     if(a.includes("Height")){
       const h = Number(b.match(/\d+/g));
-      this.props.updateHeight(h);
+      const fh= Math.floor(h);
+      console.log("HEIGHT IS HERE : "+h);
+      this.props.updateHeight(fh);
     }
     console.log('Received : ' + temp);
+  }
+}
   }
 
   handleButton = () => {
