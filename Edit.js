@@ -7,6 +7,7 @@ import {Commands} from "./config";
 import {sendCommand} from "./Scan";
 import {connect} from 'react-redux';
 import LinearGradient from 'react-native-linear-gradient';
+import Touchable from 'react-native-platform-touchable';
 import {getHeight} from './actions/index'
 import {bindActionCreators} from 'redux';
 import { debounce } from 'lodash';
@@ -122,9 +123,12 @@ class Edit extends Component {
                 alignItems: 'center',
                 justifyContent: 'center',
                 position:'relative'}}>
-              <TouchableOpacity
-                onPressOut={this.sendCommandStop}
-                onPressIn={()=>{this.handleClickMovement(Commands.UP)}}
+              <Touchable
+                onPressOut={()=>console.log("onPressOut ");this.sendCommandStop()}
+                delayPressIn={20}
+                delayPressOut={10}
+                onPress={()=>{console.log("onpress ");return false}}
+                onPressIn={()=>{console.log("onPressIn ");this.handleClickMovement(Commands.UP)}}
                 underlayColor={purple}>
                 <View >
                 <Image
@@ -139,11 +143,14 @@ class Edit extends Component {
                     alignSelf: "center",
                     justifyContent:"center",
                 }}
-                  source={require('./images/Moveup.png')}/></View></TouchableOpacity>
+                  source={require('./images/Moveup.png')}/></View></Touchable>
               <Text style={styles.heightText}>{height.toString()}</Text>
-              <TouchableOpacity
-                onPressOut={this.sendCommandStop} 
-                onPressIn={()=>{this.handleClickMovement(Commands.DOWN)}}
+              <Touchable
+                onPressOut={()=>console.log("onPressIn ");this.sendCommandStop()} 
+                delayPressIn={20}
+                delayPressOut={10}
+                onPress={()=>{console.log("onpress ");return false}}
+                onPressIn={()=>{console.log("onPressIn ");this.handleClickMovement(Commands.DOWN)}}
                 underlayColor={purple}>
                 <View>
                 <Image
@@ -158,7 +165,7 @@ class Edit extends Component {
                     alignSelf: "center",
                     justifyContent:"center",
                 }}
-                  source={require('./images/Movedown.png')}/></View></TouchableOpacity>
+                  source={require('./images/Movedown.png')}/></View></Touchable>
             </Col>
           </Row>
                     <LinearGradient start={{x: 1, y: 0}} end={{x: 0, y: 0}} colors={['#D100D0', '#4B00A4']} style={styles.linearGradient}>
