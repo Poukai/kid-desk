@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import { connect } from 'react-redux';
-import { updateHeight } from './actions/index'
+import { updateHeight ,updatePos } from './actions/index'
+import LinearGradient from 'react-native-linear-gradient';
 import {
   StyleSheet,
   View,
@@ -29,6 +30,7 @@ import BleManager from 'react-native-ble-manager'; // for talking to BLE periphe
 var Buffer = require('buffer/').Buffer
 
 const blue = "#00A7F7";
+const purple="#4B00A4";
 const ACCESS_TOKEN = 'token'
 const ACCOUNT = 'id'
 const DEVICE_NAME_DESK = "DeskBLE"
@@ -40,6 +42,32 @@ const bleManagerEmitter = new NativeEventEmitter(BleManagerModule); // create an
 
 export const sendCommand = (id, command) => {
   console.log("COMMAND SENT TO DEVICE ==> "+JSON.stringify(command));
+  if(Platform.OS === "ios"){
+    BleManager
+    .retrieveServices(id)
+    .then((peripheralInfo) => {
+      // Success code
+      console.log(peripheralInfo);
+      const id = peripheralInfo.id;
+      const services = peripheralInfo.services;
+      const characteristics = peripheralInfo.characteristics;
+      let tmp = JSON.stringify(command);
+      const data = stringToBytes(tmp);
+      BleManager
+        .writeWithoutResponse(id, services[0], characteristics[0].characteristic, data)
+        .then(() => {
+        })
+        .catch((error) => {
+          // Failure code
+          console.log(error);
+        });
+    })
+    .catch((error) => {
+      // Failure code
+      console.log(error);
+    });
+  }
+  else{
   BleManager
     .retrieveServices(id)
     .then((peripheralInfo) => {
@@ -63,6 +91,7 @@ export const sendCommand = (id, command) => {
       // Failure code
       console.log(error);
     });
+  }
 
 }
 
@@ -76,13 +105,17 @@ class Scan extends Component {
       deviceList: [],
       connected_peripheral: "",
       id: "",
-      height:0
+      height:0,
+      POS_OK:false
     };
     this.peripherals = []; // temporary storage for the detected peripherals
     this.init();
   }
   connect = (id) => {
+    
     console.log(" connecting to this device " + id);
+
+    if(Platform.OS === "ios"){
     BleManager
       .connect(id)
       .then(() => {
@@ -94,8 +127,9 @@ class Scan extends Component {
             const id = peripheralInfo.id;
             const services = peripheralInfo.services;
             const characteristics = peripheralInfo.characteristics;
-            BleManager
-              .startNotification(id, services[2].uuid, characteristics[6].characteristic)
+            console.log("peripheralInfo"+peripheralInfo);
+              BleManager
+              .startNotification(id, services[0], characteristics[0].characteristic)
               .then(() => {
                 // Success code
                 bleManagerEmitter.addListener('BleManagerDidUpdateValueForCharacteristic', this.handleUpdateValueForCharacteristic);
@@ -109,12 +143,54 @@ class Scan extends Component {
                 // Failure code
                 console.log(error);
               });
+
           });
       })
       .catch((error) => {
         Alert.alert("Err..", 'Something went wrong while trying to connect.');
       });
+    }
+    else{
 
+    BleManager
+    .connect(id)
+    .then(() => {
+      BleManager
+        .retrieveServices(id)
+        .then((peripheralInfo) => {
+          // Success code
+          console.log(peripheralInfo);
+          const id = peripheralInfo.id;
+          const services = peripheralInfo.services;
+          const characteristics = peripheralInfo.characteristics;
+          console.log("peripheralInfo"+peripheralInfo);
+            BleManager
+            .startNotification(id, services[2].uuid, characteristics[6].characteristic)
+            .then(() => {
+              // Success code
+              bleManagerEmitter.addListener('BleManagerDidUpdateValueForCharacteristic', this.handleUpdateValueForCharacteristic);
+              this.props.navigation.navigate('Control', {
+                connected_peripheral: id,
+                height: this.state.height
+              });
+              console.log('Notification started');
+            })
+            .catch((error) => {
+              // Failure code
+              console.log(error);
+            });
+        });
+    })
+    .catch((error) => {
+      Alert.alert("Err..", 'Something went wrong while trying to connect.');
+    });
+    }
+  }
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      height: nextProps.height,
+      POS_OK : nextProps.POS_OK
+    });
   }
   startScan = () => {
     this.setState({is_scanning: true});
@@ -208,6 +284,9 @@ class Scan extends Component {
     if(data && data.value){
     let temp = bytesToString(data.value);
     let a = temp+"";
+    if(a.includes("POS_OK")){
+      this.props.updatePos(true);
+    }
     console.log("a "+a);
     if(a.split(",").length>1){
     let b = a.split(",")[1];
@@ -244,25 +323,28 @@ class Scan extends Component {
           marginTop: 70
         }}
           source={require('./images/Logo.png')}/>
-        <Text style={styles.headerTitle}>Connect to Kid Desk</Text>
+        <Text style={styles.headerTitle}><Text style={styles.headerTitleHalf}>Connect to </Text>Kid Desk</Text>
         <Text style={styles.headerDesc}>You don't have any Kid Desk. Please connect this app to Kid Desk via Bluetooth.</Text>
         <View style={styles.bluetoothBox}>
           <Text style={styles.connectionStatus}>{this.state.deviceList.length > 0
               ? (this.state.connected_peripheral
                 ? "Searching for KidDesk"
                 : "Connecting to Kid Desk")
-              : "Not Connected"}</Text>
+              : "Searching for KidDesk"}</Text>
           {this.state.deviceList && <FlatList
             data={this.state.deviceList}
             style={styles.deviceList}
             keyExtractor={(item, index) => index.toString()}
-            renderItem={({item}) => <TouchableHighlight underlayColor={blue} onPress={()=>{this.selectDevice(item.id)}} style={styles.deviceListItem} key={item.id}><Text> {item.name}</Text></TouchableHighlight>}/>}
-          <Button
-            onPress={this.handleButton}
-            buttonStyle={styles.openBTsettings}
-            title="Scan for Devices"
-            large
-            backgroundColor="#017DF7"/>
+            renderItem={({item}) => <TouchableOpacity onPress={()=>{this.selectDevice(item.id)}} style={styles.deviceListItem} key={item.id}><Text> {item.name}</Text></TouchableOpacity>}/>}
+        <LinearGradient start={{x: 1, y: 0}} end={{x: 0, y: 0}} colors={['#D100D0', '#4B00A4']} style={styles.linearGradient}>
+            <Button
+              title="Scan for devices"
+              onPress={this.handleButton}
+              textStyle={{color:'#fff',fontSize:18,fontWeight:"300" , fontFamily : fontFamily}}
+              loading={this.state.loading}
+              buttonStyle={{ position:"absolute", left : 0 , right : 0  , top : -12}}
+              transparent />
+        </LinearGradient>
         </View>
       </ScrollView>
     );
@@ -279,14 +361,17 @@ const styles = StyleSheet.create({
     fontSize: 28,
     alignItems: "center",
     alignSelf: "center",
-    color: "#333",
-    fontWeight: "bold",
-    marginTop: 30
+    marginTop: 30,
+    fontWeight:"300",
+    color:"#4B00A4"
+  },
+  headerTitleHalf:{
+    color:"#37355C",
   },
   headerDesc: {
     fontFamily: fontFamily,
     fontSize: 18,
-    color: "#333",
+    color: "#37355C",
     fontWeight: "normal",
     marginTop: 15,
     textAlign: "center",
@@ -302,7 +387,7 @@ const styles = StyleSheet.create({
     marginRight: 15
   },
   deviceList: {
-    backgroundColor: '#F0EFF5',
+    backgroundColor: '#fff',
     borderTopWidth: 1,
     borderBottomWidth: 1,
     borderColor: "#979797",
@@ -320,18 +405,31 @@ const styles = StyleSheet.create({
     marginRight: 15
   },
   openBTsettings: {
-    marginBottom: 50
+    zIndex:100000
   },
   deviceListItem: {
     padding: 10
-  }
+  },
+
+linearGradient:{
+  padding:15,
+  height:54,
+  marginLeft:15,
+  marginRight:15,
+  borderRadius:25,
+  marginBottom: 50,
+  position:"relative",
+  marginTop:15,
+}
 });
 
 const mapStateToProps = (state) => ({
-  height: state.height,
+  height: state.update.height,
+  POS_OK : state.update.POS_OK
 });
 
 const mapDispatchToProps = dispatch => ({
   updateHeight: bindActionCreators(updateHeight, dispatch),
+  updatePos: bindActionCreators(updatePos, dispatch),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(Scan);

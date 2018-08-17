@@ -1,6 +1,6 @@
 import React from 'react';
 import GlobalFont from 'react-native-global-font';
-import {StyleSheet, Text, View, StatusBar, AsyncStorage} from 'react-native';
+import {StyleSheet, Text, View, StatusBar, AsyncStorage , Platform} from 'react-native';
 import {createStackNavigator} from 'react-navigation';
 import Scan from "./Scan";
 import Control from "./Control";
@@ -8,6 +8,7 @@ import Moving from "./Moving";
 import Edit from "./Edit";
 import Home from "./Home";
 import Settings from "./Settings";
+import Stopping from "./Stopping";
 import {Provider} from 'react-redux';
 import rootReducer from './reducers/index'
 import {createStore} from 'redux'
@@ -35,18 +36,24 @@ const RootStack = createStackNavigator({
   Edit: {
     screen: Edit
   },
+  Stopping: {
+    screen: Stopping
+  },
   Home: {
     screen: Home
   }
 }, {
-  initialRouteName: "Scan",
+  initialRouteName: "Home",
   transitionConfig: () => fadeIn(),
   headerMode: 'none'
 });
 
 class App extends React.Component {
   componentDidMount() {
-    let fontName = 'SFProDisplay-Regular'
+    const fontFamily = Platform.OS === "ios"
+      ? "System"
+      : "SFProDisplay-Regular"
+    let fontName = fontFamily
     GlobalFont.applyGlobal(fontName)
  }
   componentWillMount() {

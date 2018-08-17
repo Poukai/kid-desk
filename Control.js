@@ -34,7 +34,9 @@ import PouchDB from 'pouchdb-react-native'
 
 import { debounce } from 'lodash';
 import {setItem,getItem} from './localdatabase';
-
+const fontFamily = Platform.OS === "ios"
+  ? "System"
+  : "SFProDisplay-Regular"
 
 const onClickView = funcOnView => {
   return debounce(funcOnView, 1000, {
@@ -42,6 +44,7 @@ const onClickView = funcOnView => {
     leading: true
   });
 };
+const purple="#4B00A4";
 const localDB = new PouchDB('myDB')
 console.log(localDB.adapter)
 
@@ -51,20 +54,20 @@ console.log(localDB.adapter)
 //   .catch(error => console.warn('error get all Items', error))
 // import {bleManagerEmitter} from "./Scan";
 
-const {width, height} = Dimensions.get('window');
+const {width} = Dimensions.get('window');
+const deviceHeight = Dimensions.get('window').height;
 const blue = "#00A7F7";
 class Control extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      height,
+      height:0,
       userId : "A",
       index1:null,
       index2:null,
       index3:null,
       index4:null,
     };
-    
   }
   handleClickMovement = onClickView((cmd) => {
     console.log("table should move"+cmd);
@@ -94,7 +97,9 @@ class Control extends Component {
     
   })
   getDeskHeight = (id,command) => {
-    BleManager
+
+    if(Platform.OS === "ios"){
+      BleManager
     .retrieveServices(id)
     .then((peripheralInfo) => {
       // Success code
@@ -105,8 +110,9 @@ class Control extends Component {
       let tmp = JSON.stringify(command);
       const data = stringToBytes(tmp);
       BleManager
-        .write(id, services[2].uuid, characteristics[6].characteristic, data)
-        .then(() => {
+        .writeWithoutResponse(id, services[0], characteristics[0].characteristic, data)
+        .then((response) => {
+          console.log("getDeskHeight  "+response);
         })
         .catch((error) => {
           // Failure code
@@ -117,6 +123,13 @@ class Control extends Component {
       // Failure code
       console.log(error);
     });
+    }
+    else{
+      sendCommand(this.props.navigation.state.params.connected_peripheral,Commands.GET_HEIGHT)
+    }
+
+
+    
   
   }
 
@@ -127,15 +140,15 @@ class Control extends Component {
     const key4 = await getItem('4').then((result) => this.setState({ index4: result }));
     if(this.props.navigation.state.params && this.props.navigation.state.params.index && this.props.navigation.state.params.height){
       const indexKey =  this.props.navigation.state.params.index;
-      const height = Number(this.props.navigation.state.params.height);
+      let height = Number(this.props.navigation.state.params.height);
       this.setState({
         indexKey:height
       })
     }
   }
   componentWillMount(){
-    this.getValuesFromDb();
     this.getDeskHeight(this.props.navigation.state.params.connected_peripheral,Commands.GET_HEIGHT)
+    this.getValuesFromDb();
   }
   componentDidMount(){
     this.props.navigation.addListener('willFocus', () => this.getValuesFromDb())
@@ -186,8 +199,8 @@ class Control extends Component {
       height: this.state.height
     });
   }
-  moveDeskToPosition =(cmd)=>{
-    const direction="up";
+  moveDeskToPosition =(cmd,finalValue)=>{
+    const direction="off";
     this.state.height && this
       .props
       .navigation
@@ -195,6 +208,7 @@ class Control extends Component {
         connected_peripheral: this.props.navigation.state.params.connected_peripheral,
         cmd : cmd,
         direction:direction,
+        finalValue:finalValue,
         profile:this.state.userId,
         height: this.state.height
       });
@@ -202,12 +216,12 @@ class Control extends Component {
   tapAndHoldClick=onClickView((index,command)=>{
     let key = "index"+index;
     if(this.state[key]){
-      this.moveDeskToPosition(command);
+      this.moveDeskToPosition(command,this.state[key]);
     }
     else{
     Alert.alert(
       'Preset height',
-      'Do you want to preset the height point for '+index+' ?',
+      'Do you want to preset the height point for '+index+'?',
       [
         {text: 'No', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
         {text: 'Yes', onPress: () => {
@@ -224,19 +238,15 @@ class Control extends Component {
       <View style={styles.mainContainer}>
         <Grid>
         <Row style={styles.buttonsRow}>
-            <Button
-            onPress={()=>{AsyncStorage.clear()}}
-            title="Clear"
-            buttonStyle={[styles.settingsButton,this.state.userId == "A" ? styles.activeButton : styles.inactiveButton]}
-            textStyle={this.state.userId == "A" ? styles.activeButtonText : styles.inactiveButtonText}
-            transparent/>
             <View style={{flex:1}}>
           <Button
             leftIcon={{
-            name: 'settings'
+            name: 'settings',color : purple
           }}
           onPress={this.gotoSettings}
             transparent
+            iconColor={purple}
+            color={purple}
             buttonStyle={styles.settingsButtonBig}
             title='Settings'/>
             </View>
@@ -249,15 +259,18 @@ class Control extends Component {
             }}
           >
             <View style={[styles.arrowBlockExtreme]}>
-              <View
-                style={styles.arrowCircleBig}>
+              <View>
                 <Image
                   style={{
-                  width: 40,
-                  marginTop: -4,
+                  width: 50,
+                  height:50,
+                  marginTop: "auto",
+                  marginBottom:"auto",
+                  marginLeft:"auto",
+                  marginRight:"auto",
                   alignItems: "center",
                   alignSelf: "center",
-                  position: 'relative'
+                  justifyContent:"center",
                 }}
                 resizeMode="contain"
                   source={require('./images/Moveup.png')}/></View>
@@ -274,14 +287,14 @@ class Control extends Component {
               this.editDeskHeight(1);
             }}
           >
-            <View style={[styles.arrowBlockSmall]}>
+            <View style={[styles.arrowBlockSmall,{backgroundColor:"#FF66AB"}]}>
               <Text style={styles.arrowBlockSmallText}>1</Text>
               <Text style={styles.arrowBlockSmalHeight}>{this.state.index1}</Text>
-              <Text style={styles.arrowBlockSmallTapHoldText}>{this.state.index1 ? "Tap and hold to edit" : "Tap and hold to create"}</Text>
+              <Text style={styles.arrowBlockSmallTapHoldText}>{this.state.index1 ? "Tap and hold to edit" : "Tap and hold to preset"}</Text>
             </View>
           </TouchableOpacity>
           </Row>
-          <Row>
+          <Row style={{marginTop:-10}}>
           <TouchableOpacity 
              onPress={() => {
               this.tapAndHoldClick(2,Commands.POS2);
@@ -290,10 +303,10 @@ class Control extends Component {
               this.editDeskHeight(2);
             }}
           >
-            <View style={[styles.arrowBlockSmall]}>
+            <View style={[styles.arrowBlockSmall,{backgroundColor:"#6CB0FF"}]}>
               <Text style={styles.arrowBlockSmallText}>2</Text>
               <Text style={styles.arrowBlockSmalHeight}>{this.state.index2}</Text>
-              <Text style={styles.arrowBlockSmallTapHoldText}>{this.state.index2 ? "Tap and hold to edit" : "Tap and hold to create"}</Text>
+              <Text style={styles.arrowBlockSmallTapHoldText}>{this.state.index2 ? "Tap and hold to edit" : "Tap and hold to preset"}</Text>
             </View>
           </TouchableOpacity>
           </Row>
@@ -307,15 +320,18 @@ class Control extends Component {
           >
             <View
               style={[styles.arrowBlockExtreme]}>
-              <View
-            style={styles.arrowCircleBig}>
+              <View>
                 <Image
                   style={{
-                    width: 40,
-                  alignItems: "center",
-                  alignSelf: "center",
-                  marginTop: -4,
-                  position: 'relative'
+                    width: 50,
+                    height:50,
+                    marginTop: "auto",
+                    marginBottom:"auto",
+                    marginLeft:"auto",
+                    marginRight:"auto",
+                    alignItems: "center",
+                    alignSelf: "center",
+                    justifyContent:"center",
                 }}
                 resizeMode="contain"
                   source={require('./images/Movedown.png')}/></View>
@@ -333,15 +349,15 @@ class Control extends Component {
               this.editDeskHeight(3);
             }}
           >
-            <View style={[styles.arrowBlockSmall]}>
+            <View style={[styles.arrowBlockSmall,{backgroundColor:"#FFBC4E"}]}>
               <Text style={styles.arrowBlockSmallText}>3</Text>
               <Text style={styles.arrowBlockSmalHeight}>{this.state.index3}</Text>
-              <Text style={styles.arrowBlockSmallTapHoldText}>{this.state.index3 ? "Tap and hold to edit" : "Tap and hold to create"}</Text>
+              <Text style={styles.arrowBlockSmallTapHoldText}>{this.state.index3 ? "Tap and hold to edit" : "Tap and hold to preset"}</Text>
             </View>
           </TouchableOpacity>
               
           </Row>
-          <Row>
+          <Row style={{marginTop:-10}}>
           <TouchableOpacity 
              onPress={() => {
               this.tapAndHoldClick(4,Commands.POS4);
@@ -350,10 +366,10 @@ class Control extends Component {
               this.editDeskHeight(4);
             }}
           >
-            <View style={[styles.arrowBlockSmall]}>
+            <View style={[styles.arrowBlockSmall,{backgroundColor:"#D959F4"}]}>
               <Text style={styles.arrowBlockSmallText}>4</Text>
               <Text style={styles.arrowBlockSmalHeight}>{this.state.index4}</Text>
-              <Text style={styles.arrowBlockSmallTapHoldText}>{this.state.index4 ? "Tap and hold to edit" : "Tap and hold to create"}</Text>
+              <Text style={styles.arrowBlockSmallTapHoldText}>{this.state.index4 ? "Tap and hold to edit" : "Tap and hold to preset"}</Text>
             </View>
           </TouchableOpacity>
           </Row>
@@ -406,29 +422,33 @@ const styles = StyleSheet.create({
     height: 60
   },
   arrowCircleBig: {
-    backgroundColor: '#979797',
-    width: 70,
+    backgroundColor: '#fff',
+    borderColor:purple,
+    borderWidth:2,
+    width: 50,
     borderRadius: 50,
-    height: 70
+    height: 50,
+    position:"relative"
   },
   activeButton:{backgroundColor:blue,borderColor:blue},
   inactiveButton:{},
   mainContainer: {
-    backgroundColor: '#222',
+    backgroundColor: '#F7F8F9',
     position: 'absolute',
     minWidth: width,
-    minHeight: height,
+    minHeight: deviceHeight,
     left: 0,
     right: 0,
     bottom: 0,
     top: 0
   },
   arrowText: {
-    color: "#9B9B9B",
+    color: purple,
     zIndex: 10000,
     marginTop: 9,
     fontSize:20,
-    fontFamily:"SFProDisplay-Regular"
+    fontWeight:"300",
+    fontFamily:fontFamily
   },
   arrowTextBottom: {
     color: "#9B9B9B",
@@ -441,36 +461,48 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     textAlign: 'center',
-    fontFamily:"SFProDisplay-Regular"
+    fontFamily:fontFamily
   },
   arrowBlockExtreme: {
-    backgroundColor: '#000000',
+    backgroundColor: '#fff',
     width: 145,
-    maxHeight: (height-110)/2,
-    height:(height-110)/2,
+    maxHeight: (deviceHeight-120)/2,
+    height: (deviceHeight-120)/2,
     borderRadius: 20,
     marginLeft: 14,
-    marginRight: 9,
+    marginRight: 14,
     flex: 1,
     position:"relative",
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    elevation:4,
+    borderTopWidth:1,
+    borderColor:"#eaeaea",
+    shadowOffset: { width: 3, height: 2 },
+    shadowColor: "grey",
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
   },
   arrowBlockSmall:{
-    backgroundColor: '#000000',
-    width: width-34-145,
-    maxHeight: (height-140)/4,
-    height:(height-140)/4,
+    backgroundColor: '#FFFFFF',
+    width: width/2,
+    maxHeight: (deviceHeight-145)/4,
+    height:(deviceHeight-145)/4,
     borderRadius: 20,
     marginRight: 14,
     flex: 1,
     position:"relative",
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    elevation:4,
+    shadowOffset: { width: 3, height: 2 },
+    shadowColor: "grey",
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
   },
   arrowBlockSmallText :{
     fontSize: 50,
-    color:'#9B9B9B',
+    color:'#fff',
     position:"relative",
     top:-10,
   },
@@ -479,7 +511,7 @@ const styles = StyleSheet.create({
     bottom:7,
     left:0,
     right:0,
-    color:"#9B9B9B",
+    color:"#fff",
     fontSize:12,
     textAlign:'center',
   },
@@ -487,7 +519,7 @@ const styles = StyleSheet.create({
     position:'absolute',
     top:10,
     right:14,
-    color:"#9B9B9B",
+    color:"#fff",
     fontSize:16,
     textAlign:'center',
 

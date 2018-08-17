@@ -7,3 +7,8 @@ export const updateHeight = value => ({
 export const getHeight = () => ({
     type: 'GET',
   })
+
+export const updatePos = (flag) => ({
+  type: 'UPDATE_POS',
+  POS_OK:flag
+})

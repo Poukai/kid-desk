@@ -1,13 +1,13 @@
 import React, {Component} from 'react';
-import {View, Text, Image, StyleSheet, TouchableHighlight , Platform ,AsyncStorage,Alert, BackHandler} from "react-native";
+import {View, Text, Image, StyleSheet, TouchableHighlight,TouchableOpacity , Platform ,AsyncStorage,Alert, BackHandler} from "react-native";
 import {Col, Row, Grid} from "react-native-easy-grid";
 import {Icon, Button} from 'react-native-elements'
 import Dimensions from 'Dimensions';
-const {width, height} = Dimensions.get('window');
+const {width, deviceHeight} = Dimensions.get('window');
 import {Commands} from "./config";
 import {sendCommand} from "./Scan";
 import {connect} from 'react-redux';
-import {getHeight} from './actions/index'
+import {getHeight,updatePos} from './actions/index'
 import {bindActionCreators} from 'redux';
 import PouchDB from 'pouchdb-react-native'
 import { debounce } from 'lodash';
@@ -23,54 +23,58 @@ const onClickView = funcOnView => {
 const localDB = new PouchDB('myDB')
 
 const blue = "#00A7F7";
+const purple="#4B00A4";
 const fontFamily = Platform.OS === "ios"
   ? "System"
   : "SFProDisplay-Regular"
+
+const fontFamilyThin= Platform.OS === "ios"
+  ? "System"
+  : "SFProDisplay-Thin"
 class Moving extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      height,
+      height:this.props.navigation.state.params.height,
+      POS_OK : false
     };
   }
-  moveDeskBasedOnPosition = async () =>{
-    let save_position_command = Commands.SAVE_POS2;
-      let key="POS2";
-      if(this.props.navigation.state.params.profile == "A" && this.props.navigation.state.params.cmd.Command == "UP" ){
-        save_position_command = Commands.SAVE_POS2;
-        key="POS2";
-      }
-      else if(this.props.navigation.state.params.profile == "A" && this.props.navigation.state.params.cmd.Command == "DOWN" ){
-        save_position_command = Commands.SAVE_POS1;
-        key="POS1";
-      }
-      else if(this.props.navigation.state.params.profile == "B" && this.props.navigation.state.params.cmd.Command == "UP" ){
-        save_position_command = Commands.SAVE_POS4;
-        key="POS4";
-      }
-      else if(this.props.navigation.state.params.profile == "B" && this.props.navigation.state.params.cmd.Command == "DOWN" ){
-        save_position_command = Commands.SAVE_POS3;
-        key="POS3";
-      }
-      const d = await getItem(key);
-      if(d){
-        sendCommand(this.props.navigation.state.params.connected_peripheral, Commands[key]);
-      }
-      else{
-        sendCommand(this.props.navigation.state.params.connected_peripheral, this.props.navigation.state.params.cmd);
-      }
+  // moveDeskBasedOnPosition = async () =>{
+  //   let save_position_command = Commands.SAVE_POS2;
+  //     let key="POS2";
+  //     if(this.props.navigation.state.params.cmd.Command == "UP" ){
+  //       save_position_command = Commands.SAVE_POS2;
+  //       key="POS2";
+  //     }
+  //     else if(this.props.navigation.state.params.cmd.Command == "DOWN" ){
+  //       save_position_command = Commands.SAVE_POS1;
+  //       key="POS1";
+  //     }
+  //     else if( this.props.navigation.state.params.cmd.Command == "UP" ){
+  //       save_position_command = Commands.SAVE_POS4;
+  //       key="POS4";
+  //     }
+  //     else if(this.props.navigation.state.params.cmd.Command == "DOWN" ){
+  //       save_position_command = Commands.SAVE_POS3;
+  //       key="POS3";
+  //     }
+  //     const d = await getItem(key);
+  //     if(d){
+  //       sendCommand(this.props.navigation.state.params.connected_peripheral, Commands[key]);
+  //     }
+  // }
+  resetPosition(){
+    this.props.updatePos(false);
   }
   componentWillMount() {
     sendCommand(this.props.navigation.state.params.connected_peripheral, this.props.navigation.state.params.cmd);
-    // this.moveDeskBasedOnPosition()
-    // this.setState({height : this.props.navigation.state.params.height});
     
   }
   
 componentDidMount() {
   BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressed);
+  this.props.navigation.addListener('willFocus', () => this.resetPosition())
 }
-
 componentWillUnmount() {
   BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressed);
 }
@@ -83,7 +87,7 @@ onBackButtonPressed() {
   }
   HandlestopMovement= onClickView((event)=>{
     const a = sendCommand(this.props.navigation.state.params.connected_peripheral, Commands.STOP);
-    this.props.navigation.navigate('Control', {connected_peripheral: this.props.navigation.state.params.connected_peripheral});
+    this.props.navigation.navigate('Stopping', {connected_peripheral: this.props.navigation.state.params.connected_peripheral});
     //  this.stopMovement()
   })
   stopMovement = async () => {
@@ -127,15 +131,18 @@ onBackButtonPressed() {
     
   }
   componentWillReceiveProps(nextProps) {
+    console.log("componentWillReceiveProps  MOVING  "+JSON.stringify(nextProps.POS_OK));
     this.setState({
-      height: nextProps.height.height
-    }, this._storeData);
+      height: nextProps.height,
+      POS_OK : nextProps.POS_OK
+    });
+    if(nextProps.POS_OK){
+      this.props.navigation.navigate('Control', {connected_peripheral: this.props.navigation.state.params.connected_peripheral});
+    }
   }
   render() {
     let height = this.state.height;
-    console.log(height);
-    const image = this.props.navigation.state.params.direction == "up" ? require('./images/up-mini.png') : require('./images/down-mini.png');
-    const text = this.props.navigation.state.params.direction;
+    const text = this.props.navigation.state.params.direction=="off" ? "" : this.props.navigation.state.params.direction;
     // if(this.props.navigation.state.params.cmd.Command=="POS1" || this.props.navigation.state.params.cmd.Command=="POS2"){
     //     const image = "./images/up-mini.png";
     //     const text = "up";
@@ -145,7 +152,7 @@ onBackButtonPressed() {
     //     const text = "down";
     // }
     return (
-      <TouchableHighlight transparent style={styles.mainContainer} onPress={this.HandlestopMovement}>
+      <TouchableOpacity transparent style={styles.mainContainer} onPress={this.HandlestopMovement}>
         <Grid>
           <Row>
             <Col
@@ -155,17 +162,15 @@ onBackButtonPressed() {
               justifyContent: 'center',
               position: 'relative'
             }}>
-              <Text style={styles.stopText}>Desk is moving {text}...</Text>
-              { this.props.navigation.state.params.direction == "up" && <Image source={image} style={styles.arrowImage}/>}
+              <Text style={styles.stopText}>Desk is moving <Text style={{color:purple , fontWeight :"bold"}}>{text}</Text>...</Text>
               <Text style={styles.heightText}>{height.toString()}</Text>
-              { this.props.navigation.state.params.direction == "down" && <Image source={image} style={styles.arrowImage}/>}
               <View>
-                <Text style={styles.arrowText}>Tap to Stop</Text>
+                <Text style={styles.arrowText}>Tap to stop</Text>
                 </View>
             </Col>
           </Row>
         </Grid>
-      </TouchableHighlight>
+      </TouchableOpacity>
     );
   }
 }
@@ -180,36 +185,46 @@ const styles = StyleSheet.create({
     marginRight: 10
   },
   mainContainer: {
-    backgroundColor: '#000000',
-    minWidth: width,
-    minHeight: height
+    backgroundColor: '#F7F8F9',
+    width: width,
+    position:'absolute',
+    top:0,
+    bottom:0,
+    left:0,
+    right:0,
+    minHeight: deviceHeight,
   },
   arrowText: {
-    marginTop: 9,
+    marginTop: 50,
     marginBottom: 91,
-    color:"#fff",
+    color:"#000000",
     fontSize:22,
     fontFamily: fontFamily,
+    elevation:3,
+    fontWeight:"300",
+    shadowOffset: { width: 0, height: 2 },
+    shadowColor: "grey",
+    shadowOpacity: 0.5,
+    shadowRadius: 3,
   },
   heightText: {
-    color: '#fff',
-    fontSize:72,
+    color: purple,
+    fontSize:80,
     width:width,
     marginLeft:"auto",
     marginRight:"auto",
     textAlign:"center",
-    fontWeight:"100",
-    fontFamily: "SFProDisplay-Thin",
+    fontWeight:"400",
+    fontFamily: fontFamily,
   },
   stopText:{
-    color: '#9B9B9B',
+    color: '#000000',
     fontSize: 22,
     marginTop:30,
-    marginBottom:10,
+    marginBottom:50,
     marginLeft:"auto",
     marginRight:"auto",
     fontWeight:"100",
-    fontFamily: "SFProDisplay-Regular",
   },
   arrowImage:{
     width:30,
@@ -227,7 +242,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#000000',
     textAlign: 'center',
     width: 30,
-    height: height / 2,
+    height: deviceHeight / 2,
     borderRadius: 20,
     marginLeft: 20,
     marginRight: 20,
@@ -243,10 +258,14 @@ const styles = StyleSheet.create({
   }
 });
 
-const mapStateToProps = (state) => ({height: state.update});
+const mapStateToProps = (state) => ({
+  height: state.update.height,
+  POS_OK : state.update.POS_OK
+});
 
 const mapDispatchToProps = dispatch => ({
-  getHeight: bindActionCreators(getHeight, dispatch)
+  getHeight: bindActionCreators(getHeight, dispatch),
+  updatePos: bindActionCreators(updatePos, dispatch)
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Moving);

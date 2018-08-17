@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {updateHeight} from './actions/index'
+import LinearGradient from 'react-native-linear-gradient';
 import {
   StyleSheet,
   View,
@@ -23,7 +24,7 @@ import {
 } from 'react-native';
 import {createStackNavigator} from 'react-navigation';
 import {stringToBytes, bytesToString} from 'convert-string';
-import {Button, FormLabel, FormInput, FormValidationMessage} from 'react-native-elements';
+import {Button, FormLabel, FormInput, FormValidationMessage , Icon} from 'react-native-elements';
 import {bindActionCreators} from 'redux';
 import BleManager from 'react-native-ble-manager'; // for talking to BLE peripherals
 import localStorage from 'react-native-sync-localstorage';
@@ -38,7 +39,7 @@ const ACCOUNT = 'id'
 const DEVICE_NAME_DESK = "DeskBLE"
 const fontFamily = Platform.OS === "ios"
   ? "System"
-  : "SFProDisplay"
+  : "SFProDisplay-Regular"
 class Home extends Component {
   constructor(props) {
     super(props);
@@ -72,12 +73,15 @@ class Home extends Component {
     }
   }
   handleButton = () => {
+    
     if (this.state.validate) {
       // api call success
+      this.setState({
+        loading:true
+      });
       var data = new FormData();
       data.append("email", this.state.email);
       data.append("password", "123456");
-      this.setState({loading: true});
       var xhr = new XMLHttpRequest();
       xhr.withCredentials = true;
 
@@ -105,22 +109,25 @@ render() {
         marginTop: 70
       }}
         source={require('./images/Logo.png')}/>
-      <Text style={styles.headerTitle}>Welcome to Kid Desk</Text>
+      <Text style={styles.headerTitle}><Text style={styles.headerTitleHalf}>Welcome to </Text>Kid Desk</Text>
       <Text style={styles.headerDesc}>Please submit your email before using the app.</Text>
       <View style={styles.bluetoothBox}>
           <TextInput
         style={styles.emailField}
         onChangeText={(text) => this.validate(text)}
         value={this.state.email}
-        placeholder="Please enter your Email Address"
+        placeholder="Enter your email"
       />
       {this.state.showError && <FormValidationMessage>Please enter a valid email</FormValidationMessage>}
+      <LinearGradient start={{x: 1, y: 0}} end={{x: 0, y: 0}} colors={['#D100D0', '#4B00A4']} style={styles.linearGradient}>
         <Button
-          onPress={this.handleButton}
-          buttonStyle={styles.openBTsettings}
           title="Submit"
-          large
-          backgroundColor="#017DF7"/>
+          onPress={this.handleButton}
+          textStyle={{color:'#fff',fontSize:18,fontWeight:"300" , fontFamily : fontFamily}}
+          loading={this.state.loading}
+          buttonStyle={{ position:"absolute", left : 0 , right : 0  , top : -12}}
+          transparent />
+        </LinearGradient>
       </View>
     </ScrollView>
   );
@@ -138,16 +145,19 @@ headerTitle: {
   fontSize: 28,
   alignItems: "center",
   alignSelf: "center",
-  color: "#333",
-  fontWeight: "bold",
-  marginTop: 30
+  marginTop: 30,
+  fontWeight:"300",
+  color:"#4B00A4"
+},
+headerTitleHalf:{
+  color:"#37355C",
 },
 headerDesc: {
   fontFamily: fontFamily,
   fontSize: 18,
-  color: "#333333",
+  color: "#37355C",
   fontWeight: "normal",
-  marginTop: 15,
+  marginTop:40,
   textAlign: "center",
   marginLeft: 60,
   marginRight: 60,
@@ -161,12 +171,13 @@ bluetoothBox: {
 },
 emailField: {
   borderWidth: 2,
-  borderColor: "#eee",
+  borderColor: "#EBEDF1",
   paddingRight:10,
+  borderRadius:25,
   marginLeft:15,
   marginRight:15,
   paddingRight:20,
-  height:50,
+  height:52,
   textAlign:'center',
   fontSize:18
 },
@@ -189,11 +200,20 @@ connectionStatus: {
   marginRight: 15
 },
 openBTsettings: {
-  marginBottom: 50,
-  marginTop: 40
+  zIndex:100000
 },
 deviceListItem: {
   padding: 10
+},
+linearGradient:{
+  padding:15,
+  height:54,
+  marginLeft:15,
+  marginRight:15,
+  borderRadius:25,
+  marginBottom: 50,
+  position:"relative",
+  marginTop:15,
 }
 });
 
