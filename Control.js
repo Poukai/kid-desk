@@ -287,7 +287,7 @@ class Control extends Component {
               this.editDeskHeight(1);
             }}
           >
-            <View style={[styles.arrowBlockSmall,{backgroundColor:"#FF66AB"}]}>
+            <View style={[styles.arrowBlockSmall,{backgroundColor:"#FF66AB" , marginBottom:25}]}>
               <Text style={styles.arrowBlockSmallText}>1</Text>
               <Text style={styles.arrowBlockSmalHeight}>{this.state.index1}</Text>
               <Text style={styles.arrowBlockSmallTapHoldText}>{this.state.index1 ? "Tap and hold to edit" : "Tap and hold to preset"}</Text>
@@ -349,7 +349,7 @@ class Control extends Component {
               this.editDeskHeight(3);
             }}
           >
-            <View style={[styles.arrowBlockSmall,{backgroundColor:"#FFBC4E"}]}>
+            <View style={[styles.arrowBlockSmall,{backgroundColor:"#FFBC4E", marginBottom:25}]}>
               <Text style={styles.arrowBlockSmallText}>3</Text>
               <Text style={styles.arrowBlockSmalHeight}>{this.state.index3}</Text>
               <Text style={styles.arrowBlockSmallTapHoldText}>{this.state.index3 ? "Tap and hold to edit" : "Tap and hold to preset"}</Text>
@@ -465,9 +465,9 @@ const styles = StyleSheet.create({
   },
   arrowBlockExtreme: {
     backgroundColor: '#fff',
-    width: 145,
-    maxHeight: (deviceHeight-120)/2,
-    height: (deviceHeight-120)/2,
+    width: width/2 - 43,
+    maxHeight: (deviceHeight-110)/2,
+    height: (deviceHeight-110)/2,
     borderRadius: 20,
     marginLeft: 14,
     marginRight: 14,
@@ -486,8 +486,8 @@ const styles = StyleSheet.create({
   arrowBlockSmall:{
     backgroundColor: '#FFFFFF',
     width: width/2,
-    maxHeight: (deviceHeight-145)/4,
-    height:(deviceHeight-145)/4,
+    maxHeight: (deviceHeight- 125)/4 ,
+    height:(deviceHeight- 125)/4 ,
     borderRadius: 20,
     marginRight: 14,
     flex: 1,
@@ -511,6 +511,8 @@ const styles = StyleSheet.create({
     bottom:7,
     left:0,
     right:0,
+    fontWeight:"bold",
+    opacity:0.7,
     color:"#fff",
     fontSize:12,
     textAlign:'center',
@@ -530,7 +532,6 @@ const styles = StyleSheet.create({
     
   },
   controlsRow:{
-    marginTop:5,
   },
   controlsRow2:{
     marginTop:0,

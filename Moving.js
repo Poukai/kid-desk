@@ -202,10 +202,6 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily,
     elevation:3,
     fontWeight:"300",
-    shadowOffset: { width: 0, height: 2 },
-    shadowColor: "grey",
-    shadowOpacity: 0.5,
-    shadowRadius: 3,
   },
   heightText: {
     color: purple,

@@ -43,7 +43,7 @@ const RootStack = createStackNavigator({
     screen: Home
   }
 }, {
-  initialRouteName: "Home",
+  initialRouteName: "Scan",
   transitionConfig: () => fadeIn(),
   headerMode: 'none'
 });

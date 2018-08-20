@@ -115,7 +115,7 @@ class Edit extends Component {
     return (
       <View style={styles.mainContainer} pointerEvents={this.state.loading ? "none" : "auto"}>
         <Grid>
-        <View style={styles.headerTextView}><TouchableOpacity style={styles.backIconButton} underlayColor="grey" onPress={this.handleBackPress}><Icon name="chevron-left" size={40} color={purple} style={styles.headerTextIcon}/></TouchableOpacity><Text style={styles.headerText}>Edit sitting point</Text></View>
+        <View style={styles.headerTextView}><TouchableOpacity style={styles.backIconButton} underlayColor="grey" onPress={this.handleBackPress}><Icon name="chevron-left" size={40} color={purple} style={styles.headerTextIcon}/></TouchableOpacity><Text style={styles.headerText}>Edit preset height</Text></View>
           <Row style={{maxHeight:480}}>
             <Text style={styles.arrowBlockSmallText}>Tap and hold on arrow to move</Text>
             <Col style={{
@@ -123,12 +123,9 @@ class Edit extends Component {
                 alignItems: 'center',
                 justifyContent: 'center',
                 position:'relative'}}>
-              <Touchable
-                onPressOut={()=>console.log("onPressOut ");this.sendCommandStop()}
-                delayPressIn={20}
-                delayPressOut={10}
-                onPress={()=>{console.log("onpress ");return false}}
-                onPressIn={()=>{console.log("onPressIn ");this.handleClickMovement(Commands.UP)}}
+              <TouchableOpacity
+                onPressOut={()=>this.sendCommandStop()} 
+                onLongPress={()=>{this.handleClickMovement(Commands.UP)}}
                 underlayColor={purple}>
                 <View >
                 <Image
@@ -143,14 +140,11 @@ class Edit extends Component {
                     alignSelf: "center",
                     justifyContent:"center",
                 }}
-                  source={require('./images/Moveup.png')}/></View></Touchable>
+                  source={require('./images/Moveup.png')}/></View></TouchableOpacity>
               <Text style={styles.heightText}>{height.toString()}</Text>
-              <Touchable
-                onPressOut={()=>console.log("onPressIn ");this.sendCommandStop()} 
-                delayPressIn={20}
-                delayPressOut={10}
-                onPress={()=>{console.log("onpress ");return false}}
-                onPressIn={()=>{console.log("onPressIn ");this.handleClickMovement(Commands.DOWN)}}
+              <TouchableOpacity
+                onPressOut={()=>this.sendCommandStop()} 
+                onLongPress={()=>{this.handleClickMovement(Commands.DOWN)}}
                 underlayColor={purple}>
                 <View>
                 <Image
@@ -165,7 +159,7 @@ class Edit extends Component {
                     alignSelf: "center",
                     justifyContent:"center",
                 }}
-                  source={require('./images/Movedown.png')}/></View></Touchable>
+                  source={require('./images/Movedown.png')}/></View></TouchableOpacity>
             </Col>
           </Row>
                     <LinearGradient start={{x: 1, y: 0}} end={{x: 0, y: 0}} colors={['#D100D0', '#4B00A4']} style={styles.linearGradient}>

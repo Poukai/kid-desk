@@ -26,6 +26,9 @@ class Settings extends Component {
   resetDesk=()=>{
   sendCommand(this.props.navigation.state.params.connected_peripheral, Commands.RESET);
   this.setState({resetting:true});
+  setTimeout(() => {
+    this.setState({resetting:false,done:true});
+  }, 12000);
   // sendCommand(this.props.navigation.state.params.connected_peripheral, Commands.GET_HEIGHT);
   }
   componentDidMount() {
@@ -41,18 +44,15 @@ class Settings extends Component {
   }
   componentWillReceiveProps(nextProps) {
     console.log("HEIGHT "+nextProps.height.height);
-    if(nextProps.height.height <= 72){
-      this.setState({
-        resetting:true,
-        done:true,
-      },this
-      .props
-      .navigation
-      .navigate('Control', {connected_peripheral: this.props.navigation.state.params.connected_peripheral }))
-    }
     this.setState({
       height: nextProps.height.height
     });
+    if(nextProps.height.height <=70){
+      this
+      .props
+      .navigation
+      .navigate('Control', {connected_peripheral: this.props.navigation.state.params.connected_peripheral })
+    }
   }
   handleClickMovement=()=> {
     Alert.alert(
@@ -80,7 +80,7 @@ class Settings extends Component {
     return (
       <View style={styles.mainContainer}  pointerEvents={this.state.resetting ? "none" : "auto"}>
         <Grid>
-        <View style={styles.headerTextView}><TouchableOpacity style={styles.backIconButton} underlayColor="grey" onPress={this.handleBackPress}><Icon name="chevron-left" size={40} color="#37355C" style={styles.headerTextIconback}/></TouchableOpacity><Text style={styles.headerText}>Settings</Text></View>
+        <View style={styles.headerTextView}><TouchableOpacity style={styles.backIconButton}  onPress={this.handleBackPress}><Icon name="chevron-left" size={40} color="#37355C" style={styles.headerTextIconback}/></TouchableOpacity><Text style={styles.headerText}>Settings</Text></View>
         <View>
           <Row style={styles.resetBlock}>{this.state.done && <View style={styles.resetCompletedText}><Text style={{color :"#37355C" , fontSize :18 }}>Reset Completed!</Text></View>}
               <TouchableHighlight style={styles.resetIconView} onPress={this.handleClickMovement} >
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   headerText:{
-    color: "#37355C",
+    color: purple,
     fontSize:18,
     justifyContent: "space-between",
     paddingTop:8,
