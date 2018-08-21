@@ -20,8 +20,10 @@ import {
   Platform,
   FlatList,
   PermissionsAndroid,
-  Alert
+  Alert,
+  Linking
 } from 'react-native';
+
 import {createStackNavigator} from 'react-navigation';
 import {stringToBytes, bytesToString} from 'convert-string';
 import {Button} from 'react-native-elements';
@@ -42,6 +44,17 @@ const bleManagerEmitter = new NativeEventEmitter(BleManagerModule); // create an
 
 export const sendCommand = (id, command) => {
   console.log("COMMAND SENT TO DEVICE ==> "+JSON.stringify(command));
+  BleManager.isPeripheralConnected(id, [])
+  .then((isConnected) => {
+    if (isConnected) {
+      console.log('Peripheral is connected!');
+    } else {
+      this.props.navigation.navigate('Scan', {
+        connected_peripheral: id,
+      });
+      console.log('Peripheral is NOT connected!');
+    }
+  });
   if(Platform.OS === "ios"){
     BleManager
     .retrieveServices(id)
@@ -110,11 +123,17 @@ class Scan extends Component {
     };
     this.peripherals = []; // temporary storage for the detected peripherals
     this.init();
+    this.interval= null;
   }
   connect = (id) => {
-    
-    console.log(" connecting to this device " + id);
+    this.interval && clearInterval(this.interval);
+    BleManager.stopScan()
+    .then(() => {
+      // Success code
+      console.log('Scan stopped');
+    });
 
+    console.log(" connecting to this device " + id);
     if(Platform.OS === "ios"){
     BleManager
       .connect(id)
@@ -195,13 +214,19 @@ class Scan extends Component {
   startScan = () => {
     this.setState({is_scanning: true});
 
-    BleManager.scan([], 5).then(() => {
+    BleManager.scan([], 15).then(() => {
       console.log('scan started');
     });
 
   }
-  componentDidMount() {}
+  componentDidMount() {
+  }
+  componentWillUnmount() {
+    this.interval && clearInterval(this.interval);
+  }
+  
   init = () => {
+
     Platform.OS == "android" && BleManager
       .enableBluetooth()
       .then(() => {
@@ -222,15 +247,23 @@ class Scan extends Component {
       });
     // initialize the BLE module
     BleManager
-      .start({showAlert: false})
+      .start({showAlert: true})
       .then(() => {
-        console.log('Module initialized');
-      });
 
+      this.interval =  setInterval(()=>{
+        BleManager.scan([], 15).then(() => {
+        console.log('scan started');
+      });
+        },1000);
+      });
+    
+    BleManager.scan([], 15).then(() => {
+      console.log('scan started');
+    });
     if (this.peripherals.length > 0) {
       for (let i in this.peripherals) {
         if (this.peripherals[i].name == "KidDesk") {
-          // this.selectKidDesk(this.peripherals[i])
+          this.selectKidDesk(this.peripherals[i])
         }
       }
     }
@@ -338,10 +371,10 @@ class Scan extends Component {
             renderItem={({item}) => <TouchableOpacity onPress={()=>{this.selectDevice(item.id)}} style={styles.deviceListItem} key={item.id}><Text> {item.name}</Text></TouchableOpacity>}/>}
         <LinearGradient start={{x: 1, y: 0}} end={{x: 0, y: 0}} colors={['#D100D0', '#4B00A4']} style={styles.linearGradient}>
             <Button
-              title="Scan for devices"
+              title="Scanning for Kid Desk"
               onPress={this.handleButton}
+              loading={true}
               textStyle={{color:'#fff',fontSize:18,fontWeight:"300" , fontFamily : fontFamily}}
-              loading={this.state.loading}
               buttonStyle={{ position:"absolute", left : 0 , right : 0  , top : -12}}
               transparent />
         </LinearGradient>

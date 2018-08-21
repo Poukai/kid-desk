@@ -28,7 +28,7 @@ class Settings extends Component {
   this.setState({resetting:true});
   setTimeout(() => {
     this.setState({resetting:false,done:true});
-  }, 12000);
+  }, 14000);
   // sendCommand(this.props.navigation.state.params.connected_peripheral, Commands.GET_HEIGHT);
   }
   componentDidMount() {
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   },
   backIconButton:{
     position:'relative',
-    zIndex:10000
+    zIndex:99999
   },
   arrowCircle: {
     backgroundColor: '#979797',
@@ -128,6 +128,7 @@ const styles = StyleSheet.create({
     position:"absolute",
     flexDirection:'row',
     paddingLeft:5,
+    zIndex:10000,
     maxHeight:80,
     justifyContent: "space-between",
   },

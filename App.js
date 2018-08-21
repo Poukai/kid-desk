@@ -6,6 +6,7 @@ import Scan from "./Scan";
 import Control from "./Control";
 import Moving from "./Moving";
 import Edit from "./Edit";
+import SplashScreen from 'react-native-splash-screen';
 import Home from "./Home";
 import Settings from "./Settings";
 import Stopping from "./Stopping";
@@ -43,13 +44,14 @@ const RootStack = createStackNavigator({
     screen: Home
   }
 }, {
-  initialRouteName: "Scan",
+  initialRouteName: "Home",
   transitionConfig: () => fadeIn(),
   headerMode: 'none'
 });
 
 class App extends React.Component {
   componentDidMount() {
+    SplashScreen.hide();
     const fontFamily = Platform.OS === "ios"
       ? "System"
       : "SFProDisplay-Regular"

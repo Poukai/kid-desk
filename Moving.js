@@ -162,7 +162,7 @@ onBackButtonPressed() {
               justifyContent: 'center',
               position: 'relative'
             }}>
-              <Text style={styles.stopText}>Desk is moving <Text style={{color:purple , fontWeight :"bold"}}>{text}</Text>...</Text>
+            {this.props.navigation.state.params.direction=="off" ? <Text style={styles.stopText}>Desk is moving...</Text> : <Text style={styles.stopText}>Desk is moving <Text style={{color:purple , fontWeight :"bold"}}>{text}</Text>...</Text>}
               <Text style={styles.heightText}>{height.toString()}</Text>
               <View>
                 <Text style={styles.arrowText}>Tap to stop</Text>
