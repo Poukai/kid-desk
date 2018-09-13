@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import { connect } from 'react-redux';
-import { getHeight } from './actions/index'
+import { getHeight } from './actions/index';
+import RNRestart from 'react-native-restart';
 import {
   StyleSheet,
   View,
@@ -19,7 +20,8 @@ import {
   Platform,
   FlatList,
   PermissionsAndroid,
-  Alert
+  Alert,
+  AppState
 } from 'react-native';
 import {createStackNavigator} from 'react-navigation';
 import {stringToBytes, bytesToString} from 'convert-string';
@@ -67,6 +69,7 @@ class Control extends Component {
       index2:null,
       index3:null,
       index4:null,
+      appState: AppState.currentState
     };
   }
   handleClickMovement = onClickView((cmd) => {
@@ -151,12 +154,22 @@ class Control extends Component {
     this.getValuesFromDb();
   }
   componentDidMount(){
+    AppState.addEventListener('change', this._handleAppStateChange);
     this.props.navigation.addListener('willFocus', () => this.getValuesFromDb())
   }
   componentWillReceiveProps(nextProps) {
     this.setState({
       height: nextProps.height.height
     });
+  }
+  componentWillUnmount(){
+    AppState.removeEventListener('change', this._handleAppStateChange);
+  }
+  _handleAppStateChange = (nextAppState) => {
+    if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
+      RNRestart.Restart();
+    }
+    this.setState({appState: nextAppState});
   }
   gotoSettings=()=>{
     this
