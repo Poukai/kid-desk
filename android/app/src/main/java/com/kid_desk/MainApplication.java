@@ -3,6 +3,7 @@ package com.kid_desk;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.bugsnag.BugsnagReactNative;
 import com.avishayil.rnrestart.ReactNativeRestartPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
@@ -28,6 +29,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            BugsnagReactNative.getPackage(),
             new ReactNativeRestartPackage(),
             new SplashScreenReactPackage(),
             new LinearGradientPackage(),

@@ -16,8 +16,10 @@ import {createStore} from 'redux'
 import {fadeIn} from 'react-navigation-transitions';
 import localStorage from 'react-native-sync-localstorage';
 import './ReactotronConfig.js';
+import { Client } from 'bugsnag-react-native';
 
 global.id="abcdef0123456789";
+const bugsnag = new Client("add3cdaa945a1c500c823a27f54c05df");
 
 const store = createStore(rootReducer);
 

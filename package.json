@@ -29,6 +29,7 @@
     "@babel/preset-react": "^7.0.0-beta.53",
     "babel-preset-react-native": "^5.0.2",
     "buffer": "^5.1.0",
+    "bugsnag-react-native": "^2.11.0",
     "convert-string": "^0.1.0",
     "email-validator": "^2.0.4",
     "lodash": "^4.17.10",
