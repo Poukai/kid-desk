@@ -1,4 +1,4 @@
 {
-  "presets": ["react-native"],
-  "sourceMaps": "inline"
+  "presets": ["react-native", "@babel/preset-flow"],
+  "retainLines": true
 }
