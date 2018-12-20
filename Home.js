@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {updateHeight} from './actions/index'
+import LinearGradient from 'react-native-linear-gradient';
 import {
   StyleSheet,
   View,
@@ -23,11 +24,13 @@ import {
 } from 'react-native';
 import {createStackNavigator} from 'react-navigation';
 import {stringToBytes, bytesToString} from 'convert-string';
-import {Button, FormLabel, FormInput, FormValidationMessage} from 'react-native-elements';
+import {Button, FormLabel, FormInput, FormValidationMessage , Icon} from 'react-native-elements';
 import {bindActionCreators} from 'redux';
 import BleManager from 'react-native-ble-manager'; // for talking to BLE peripherals
 import localStorage from 'react-native-sync-localstorage';
-
+const {width, height} = Dimensions.get('window');
+ 
+var validator = require("email-validator");
 var Buffer = require('buffer/').Buffer
 
 const blue = "#00A7F7";
@@ -36,19 +39,19 @@ const ACCOUNT = 'id'
 const DEVICE_NAME_DESK = "DeskBLE"
 const fontFamily = Platform.OS === "ios"
   ? "System"
-  : "SanFrancisco"
+  : "SFProDisplay-Regular"
 class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
       email: "",
       validate: false,
-      loading: false
+      loading: false,
+      showError:false,
     };
     this.checkAuth();
   }
   checkAuth=()=>{
-    this.props.navigation.navigate('Scan');
     let storage = async() => await AsyncStorage.getItem('auth');
     storage().then((res) => {
       if (res) {
@@ -62,25 +65,23 @@ class Home extends Component {
     });
   }
   validate = (text) => {
-    console.log(text);
-    let reg = /\S+@\S+/;
-    if (reg.test(text) === false) {
-      console.log("Email is Not Correct");
-      this.setState({validate: false, email: text})
-      return false;
+    let a = validator.validate(text); // true
+    if (validator.validate(text)) {
+      this.setState({validate: true, email: text,showError : false})
     } else {
-      this.setState({validate: true, email: text})
-      Keyboard.dismiss()
-      console.log("Email is Correct");
+      this.setState({validate: false, email: text ,showError : true})
     }
   }
   handleButton = () => {
+    
     if (this.state.validate) {
       // api call success
+      this.setState({
+        loading:true
+      });
       var data = new FormData();
-      data.append("email", "amit@a.com");
+      data.append("email", this.state.email);
       data.append("password", "123456");
-      this.setState({loading: true});
       var xhr = new XMLHttpRequest();
       xhr.withCredentials = true;
 
@@ -108,20 +109,25 @@ render() {
         marginTop: 70
       }}
         source={require('./images/Logo.png')}/>
-      <Text style={styles.headerTitle}>Welcome to Kid Desk</Text>
+      <Text style={styles.headerTitle}><Text style={styles.headerTitleHalf}>Welcome to </Text>Kid Desk</Text>
       <Text style={styles.headerDesc}>Please submit your email before using the app.</Text>
       <View style={styles.bluetoothBox}>
-        <FormLabel>Please enter your Email</FormLabel>
-        <FormInput
-          onChangeText={(text) => this.validate(text)}
-          value={this.state.email}
-          inputStyle={styles.emailField}/>{!this.state.validate && <FormValidationMessage>Please enter a valid Email</FormValidationMessage>}
+          <TextInput
+        style={styles.emailField}
+        onChangeText={(text) => this.validate(text)}
+        value={this.state.email}
+        placeholder="Enter your email"
+      />
+      {this.state.showError && <FormValidationMessage>Please enter a valid email</FormValidationMessage>}
+      <LinearGradient start={{x: 1, y: 0}} end={{x: 0, y: 0}} colors={['#D100D0', '#4B00A4']} style={styles.linearGradient}>
         <Button
-          onPress={this.handleButton}
-          buttonStyle={styles.openBTsettings}
           title="Submit"
-          large
-          backgroundColor="#017DF7"/>
+          onPress={this.handleButton}
+          textStyle={{color:'#fff',fontSize:18,fontWeight:"300" , fontFamily : fontFamily}}
+          loading={this.state.loading}
+          buttonStyle={{ position:"absolute", left : 0 , right : 0  , top : -12}}
+          transparent />
+        </LinearGradient>
       </View>
     </ScrollView>
   );
@@ -139,19 +145,22 @@ headerTitle: {
   fontSize: 28,
   alignItems: "center",
   alignSelf: "center",
-  color: "#333",
-  fontWeight: "bold",
-  marginTop: 30
+  marginTop: 30,
+  fontWeight:"300",
+  color:"#4B00A4"
+},
+headerTitleHalf:{
+  color:"#37355C",
 },
 headerDesc: {
   fontFamily: fontFamily,
-  fontSize: 17,
-  color: "#333",
+  fontSize: 18,
+  color: "#37355C",
   fontWeight: "normal",
-  marginTop: 15,
+  marginTop:40,
   textAlign: "center",
-  marginLeft: 15,
-  marginRight: 15,
+  marginLeft: 60,
+  marginRight: 60,
   marginBottom: 40
 },
 bluetoothBox: {
@@ -161,8 +170,16 @@ bluetoothBox: {
   marginRight: 15
 },
 emailField: {
-  borderBottomWidth: 1,
-  borderColor: "#eee"
+  borderWidth: 2,
+  borderColor: "#EBEDF1",
+  paddingRight:10,
+  borderRadius:25,
+  marginLeft:15,
+  marginRight:15,
+  paddingRight:20,
+  height:52,
+  textAlign:'center',
+  fontSize:18
 },
 deviceList: {
   backgroundColor: '#F0EFF5',
@@ -183,11 +200,20 @@ connectionStatus: {
   marginRight: 15
 },
 openBTsettings: {
-  marginBottom: 50,
-  marginTop: 40
+  zIndex:100000
 },
 deviceListItem: {
   padding: 10
+},
+linearGradient:{
+  padding:15,
+  height:54,
+  marginLeft:15,
+  marginRight:15,
+  borderRadius:25,
+  marginBottom: 50,
+  position:"relative",
+  marginTop:15,
 }
 });
 

@@ -148,6 +148,10 @@ android {
 }
 
 dependencies {
+    compile project(':bugsnag-react-native')
+    compile project(':react-native-restart')
+    compile project(':react-native-splash-screen')
+    compile project(':react-native-linear-gradient')
     compile project(':react-native-vector-icons')
     compile project(':react-native-ble-manager')
     compile fileTree(dir: "libs", include: ["*.jar"])

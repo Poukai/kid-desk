@@ -1,19 +1,25 @@
 import React from 'react';
-import {StyleSheet, Text, View, StatusBar, AsyncStorage} from 'react-native';
+import GlobalFont from 'react-native-global-font';
+import {StyleSheet, Text, View, StatusBar, AsyncStorage , Platform} from 'react-native';
 import {createStackNavigator} from 'react-navigation';
 import Scan from "./Scan";
 import Control from "./Control";
 import Moving from "./Moving";
 import Edit from "./Edit";
+import SplashScreen from 'react-native-splash-screen';
 import Home from "./Home";
 import Settings from "./Settings";
+import Stopping from "./Stopping";
 import {Provider} from 'react-redux';
 import rootReducer from './reducers/index'
 import {createStore} from 'redux'
 import {fadeIn} from 'react-navigation-transitions';
 import localStorage from 'react-native-sync-localstorage';
+import './ReactotronConfig.js';
+import { Client } from 'bugsnag-react-native';
 
 global.id="abcdef0123456789";
+const bugsnag = new Client("add3cdaa945a1c500c823a27f54c05df");
 
 const store = createStore(rootReducer);
 
@@ -33,6 +39,9 @@ const RootStack = createStackNavigator({
   Edit: {
     screen: Edit
   },
+  Stopping: {
+    screen: Stopping
+  },
   Home: {
     screen: Home
   }
@@ -43,6 +52,14 @@ const RootStack = createStackNavigator({
 });
 
 class App extends React.Component {
+  componentDidMount() {
+    SplashScreen.hide();
+    const fontFamily = Platform.OS === "ios"
+      ? "System"
+      : "SFProDisplay-Regular"
+    let fontName = fontFamily
+    GlobalFont.applyGlobal(fontName)
+ }
   componentWillMount() {
   }
   render() {
